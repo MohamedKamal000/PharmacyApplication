@@ -2,7 +2,11 @@
 {
     public enum Users
     {
-        
+        PhoneNumber,
+        UserName,
+        Email,
+        Password, // i will hash it later on 
+        Role
     }
 
     public enum Orders
