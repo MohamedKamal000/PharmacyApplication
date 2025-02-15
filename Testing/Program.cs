@@ -14,8 +14,8 @@ namespace Testing
             Console.WriteLine(test.ToString());
             */
 
-            if (TableManager<Users>.SelectFromTable(
-                    new KeyValuePair<Users, object>(Users.Email, null), out DataTable dt))
+            /*if (TableManager<Users>.SelectFromTable(
+                    new KeyValuePair<Users, object>(Users.Role, false), out DataTable dt))
             {
                 Console.WriteLine("yes");
                 foreach (DataRow dr in dt.Rows)
@@ -29,8 +29,42 @@ namespace Testing
                     Console.WriteLine($"Role: {(bool) dr["Role"]}");
                 }
             }
+            */
+
+
+            /*int result = TableManager<Users>.InsertIntoTable(new Dictionary<Users, object>()
+            {
+                {
+                    Users.UserName, "Magdy"
+                },
+                {
+                    Users.Email, null
+                },
+                {
+                    Users.PhoneNumber, "001122"
+                },
+                {
+                    Users.Password, "hamadaAl3ra"
+                },
+                {
+                    Users.Role, true
+                }
+            });*/
             
+            /*
+            int result = TableManager<Users>.UpdateTable(new KeyValuePair<Users, object>(Users.Email,null),
+                new Dictionary<Users, object>()
+                {
+                    {Users.PhoneNumber, "0150055"},
+                    {Users.UserName,"Mohamed Salah"},
+                    {Users.Role , false},
+                    {Users.Email, "MohamedSalah@.com"},
+                    { Users.Password, "00112233"}
+                });
+                */
             
+            int result = TableManager<Users>.DeleteFromTable(new KeyValuePair<Users, object>(Users.ID, 12));
+            Console.WriteLine(result);
         }
     }
 }

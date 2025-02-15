@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace DataAccess
 {
@@ -24,8 +25,12 @@ namespace DataAccess
                 default:
                     return value.ToString(); // Numbers and other types
             }
-
         } 
+        
+        private static object CheckForDbnull(object value)
+        {
+            return value ?? DBNull.Value;
+        }
         
         public static IUserRole Login(string userName, string password)
         {
@@ -100,6 +105,8 @@ namespace DataAccess
             return resultID;
         }
         
+        
+        // does not work for null values i may make one that work for nulls 
         public static bool SelectFromTable(KeyValuePair<T, object> whereClauseConstruction, out DataTable dt)
         {
             bool isOK = false;
@@ -113,15 +120,8 @@ namespace DataAccess
 
             command.Parameters.AddWithValue("@TableName", table);
             command.Parameters.AddWithValue("@ColumnName", column);
-            if (whereClauseConstruction.Value == null)
-            {
-                 command.Parameters.AddWithValue("@InputValue",DBNull.Value);
-            }
-            else
-            {
-                string value = whereClauseConstruction.Value.ToString();
-                command.Parameters.AddWithValue("@InputValue",value);
-            }
+            command.Parameters.AddWithValue("@InputValue",CheckForDbnull(whereClauseConstruction.Value));
+            
            
             try
             {
@@ -144,6 +144,84 @@ namespace DataAccess
 
             return isOK;
         }
-      
+        
+        public static int UpdateTable(KeyValuePair<T, object> whereClause, Dictionary<T, object> updates)
+        {
+            int result = -1;
+
+            SqlConnection connection = new SqlConnection(DBSettings.connectionString);
+            string table = typeof(T).Name;
+            string column = whereClause.Key.ToString();
+            JObject j_updates = new JObject();
+            foreach (var P in updates)
+            {
+                j_updates.Add(P.Key.ToString(),ToSqlTypeConvertor(P.Value));
+            }
+
+            string j_updates_string = j_updates.ToString();
+            SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.UpdateTable.ToString(), connection);
+
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@TableName", table);
+            command.Parameters.AddWithValue("@ColumnName", column);
+            command.Parameters.AddWithValue("@Updates", j_updates_string);
+            command.Parameters.AddWithValue("@UserColumnName",CheckForDbnull(whereClause.Value));
+            
+
+            try
+            {
+                connection.Open();
+
+                result = command.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result;
+        }
+
+
+        public static int DeleteFromTable(KeyValuePair<T, object> whereClause)
+        {
+            int result = -1;
+            SqlConnection connection = new SqlConnection(DBSettings.connectionString);
+
+            string table = typeof(T).Name;
+            string column = whereClause.Key.ToString();
+            SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.DeleteFromTable.ToString(), connection);
+
+            command.CommandType = CommandType.StoredProcedure;
+
+            command.Parameters.AddWithValue("@TableName", table);
+            command.Parameters.AddWithValue("@ColumnName", column);
+            command.Parameters.AddWithValue("@UserColumnInput",CheckForDbnull(whereClause.Value));
+            
+
+            try
+            {
+                connection.Open();
+
+                result = command.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result;
+        }
+        
     }
 }
