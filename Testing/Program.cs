@@ -62,9 +62,10 @@ namespace Testing
                     { Users.Password, "00112233"}
                 });
                 */
+
+            PasswordHasher passwordHasher = new PasswordHasher();
             
-            int result = TableManager<Users>.DeleteFromTable(new KeyValuePair<Users, object>(Users.ID, 12));
-            Console.WriteLine(result);
+            Console.WriteLine(passwordHasher.Verify("password",passwordHasher.Hash("passwodd")));
         }
     }
 }
