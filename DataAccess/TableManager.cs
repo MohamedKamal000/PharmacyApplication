@@ -101,7 +101,6 @@ namespace DataAccess
         public static int UpdateTable(KeyValuePair<T, object> whereClause, Dictionary<T, object> updates)
         {
             int result = -1;
-            SqlConnection connection = new SqlConnection(DBSettings.connectionString);
             string table = typeof(T).Name;
             string column = whereClause.Key.ToString();
             JObject j_updates = new JObject();
@@ -109,33 +108,25 @@ namespace DataAccess
             {
                 j_updates.Add(P.Key.ToString(),ToSqlTypeConvertor(P.Value));
             }
-
-            string j_updates_string = j_updates.ToString();
-            SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.UpdateTable.ToString(), connection);
-
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@TableName", table);
-            command.Parameters.AddWithValue("@ColumnName", column);
-            command.Parameters.AddWithValue("@Updates", j_updates_string);
-            command.Parameters.AddWithValue("@UserColumnName",CheckForDbnull(whereClause.Value));
             
+            string j_updates_string = j_updates.ToString();
 
-            try
+            using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
             {
-                connection.Open();
+                using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.UpdateTable.ToString()
+                           , connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@TableName", table);
+                    command.Parameters.AddWithValue("@ColumnName", column);
+                    command.Parameters.AddWithValue("@Updates", j_updates_string);
+                    command.Parameters.AddWithValue("@UserColumnName",CheckForDbnull(whereClause.Value));
+                    connection.Open();
 
-                result = command.ExecuteNonQuery();
+                    result = command.ExecuteNonQuery();
+                }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-
+            
             return result;
         }
 
@@ -143,35 +134,24 @@ namespace DataAccess
         public static int DeleteFromTable(KeyValuePair<T, object> whereClause)
         {
             int result = -1;
-            SqlConnection connection = new SqlConnection(DBSettings.connectionString);
-
             string table = typeof(T).Name;
             string column = whereClause.Key.ToString();
-            SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.DeleteFromTable.ToString(), connection);
-
-            command.CommandType = CommandType.StoredProcedure;
-
-            command.Parameters.AddWithValue("@TableName", table);
-            command.Parameters.AddWithValue("@ColumnName", column);
-            command.Parameters.AddWithValue("@UserColumnInput",CheckForDbnull(whereClause.Value));
+           
+            using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.DeleteFromTable.ToString()
+                           , connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@TableName", table);
+                    command.Parameters.AddWithValue("@ColumnName", column);
+                    command.Parameters.AddWithValue("@UserColumnInput",CheckForDbnull(whereClause.Value));
+                    connection.Open();
+                    result = command.ExecuteNonQuery();
+                }
+            }
             
-
-            try
-            {
-                connection.Open();
-
-                result = command.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-
+            
             return result;
         }
         

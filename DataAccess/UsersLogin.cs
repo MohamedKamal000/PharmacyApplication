@@ -6,7 +6,6 @@ namespace DataAccess
 {
     // should consider adding any of the following features later on 
     
-    
     /*
          Register     
         ChangePassword
@@ -41,7 +40,7 @@ namespace DataAccess
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.Read() && passwordHasher.Verify(
-                                passwordHasher.Hash(password), (string)reader["Password"]))
+                               password, (string)reader["Password"]))
                         {
                             userRole = (bool)reader["Role"] ? new Admin() as IUserRole : new User() as IUserRole;
                             isOK = true;
