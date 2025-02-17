@@ -19,7 +19,15 @@ namespace Testing
                 { Users.Password , passwordHasher.Hash("HelloWorld")},
                 { Users.Role , false}
             });*/
-            
+
+            try
+            {
+                throw new Exception("Hi");
+            }
+            catch (Exception e)
+            {
+                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
+            }
         }
     }
 }

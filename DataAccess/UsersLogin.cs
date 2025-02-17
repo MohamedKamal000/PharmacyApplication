@@ -42,7 +42,8 @@ namespace DataAccess
                         if (reader.Read() && passwordHasher.Verify(
                                password, (string)reader["Password"]))
                         {
-                            userRole = (bool)reader["Role"] ? new Admin() as IUserRole : new User() as IUserRole;
+                            userRole = (bool)reader["Role"] ? new Admin((string) reader["PhoneNumber"]) as IUserRole 
+                                : new User((string) reader["PhoneNumber"]) as IUserRole;
                             isOK = true;
                         }
                     }
