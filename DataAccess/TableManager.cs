@@ -40,28 +40,35 @@ namespace DataAccess
             string columns = string.Join(",",attributes.Keys);
             string values = string.Join(",", attributes.Values.Select(ToSqlTypeConvertor));
 
-
-            using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
+            try
             {
-                using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.InsertIntoAnyTable.ToString()
-                           , connection))
+                using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
                 {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@TableName", table);
-                    command.Parameters.AddWithValue("@Columns", columns);
-                    command.Parameters.AddWithValue("@Values", values);
-                    connection.Open();
-                    
-                    object result = command.ExecuteScalar();
-
-                    if (result != null && int.TryParse(result.ToString(),out int id))
+                    using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.InsertIntoAnyTable.ToString()
+                               , connection))
                     {
-                        resultID = id;
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@TableName", table);
+                        command.Parameters.AddWithValue("@Columns", columns);
+                        command.Parameters.AddWithValue("@Values", values);
+                        connection.Open();
+                    
+                        object result = command.ExecuteScalar();
+
+                        if (result != null && int.TryParse(result.ToString(),out int id))
+                        {
+                            resultID = id;
+                        }
                     }
                 }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error Happen: {e}");
+                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
+                throw;
+            }
             
-
             return resultID;
         }
         
@@ -72,28 +79,37 @@ namespace DataAccess
             bool isOK = false;
             string table = typeof(T).Name;
             string column = whereClauseConstruction.Key.ToString();
-           
 
-            using(SqlConnection connection = new SqlConnection(DBSettings.connectionString))
+            try
             {
-                using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.SelectFromTable.ToString(),
-                           connection))
+                using(SqlConnection connection = new SqlConnection(DBSettings.connectionString))
                 {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    command.Parameters.AddWithValue("@TableName", table);
-                    command.Parameters.AddWithValue("@ColumnName", column);
-                    command.Parameters.AddWithValue("@InputValue",CheckForDbnull(whereClauseConstruction.Value));
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.SelectFromTable.ToString(),
+                               connection))
                     {
-                        dt = new DataTable();
-                        dt.Load(reader);
-                        reader.Close();
-                        isOK = true;
-                    }
-                }     
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        command.Parameters.AddWithValue("@TableName", table);
+                        command.Parameters.AddWithValue("@ColumnName", column);
+                        command.Parameters.AddWithValue("@InputValue",CheckForDbnull(whereClauseConstruction.Value));
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            dt = new DataTable();
+                            dt.Load(reader);
+                            reader.Close();
+                            isOK = true;
+                        }
+                    }     
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error Happen: {e}");
+                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
+                throw;
+            }
+            
 
             return isOK;
         }
@@ -111,46 +127,63 @@ namespace DataAccess
             
             string j_updates_string = j_updates.ToString();
 
-            using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
+            try
             {
-                using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.UpdateTable.ToString()
-                           , connection))
+                using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
                 {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@TableName", table);
-                    command.Parameters.AddWithValue("@ColumnName", column);
-                    command.Parameters.AddWithValue("@Updates", j_updates_string);
-                    command.Parameters.AddWithValue("@UserColumnName",CheckForDbnull(whereClause.Value));
-                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.UpdateTable.ToString()
+                               , connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@TableName", table);
+                        command.Parameters.AddWithValue("@ColumnName", column);
+                        command.Parameters.AddWithValue("@Updates", j_updates_string);
+                        command.Parameters.AddWithValue("@UserColumnName",CheckForDbnull(whereClause.Value));
+                        connection.Open();
 
-                    result = command.ExecuteNonQuery();
+                        result = command.ExecuteNonQuery();
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error Happen: {e}");
+                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
+                throw;
+            }
+            
             
             return result;
         }
-
 
         public static int DeleteFromTable(KeyValuePair<T, object> whereClause)
         {
             int result = -1;
             string table = typeof(T).Name;
             string column = whereClause.Key.ToString();
-           
-            using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
+
+            try
             {
-                using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.DeleteFromTable.ToString()
-                           , connection))
+                using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
                 {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@TableName", table);
-                    command.Parameters.AddWithValue("@ColumnName", column);
-                    command.Parameters.AddWithValue("@UserColumnInput",CheckForDbnull(whereClause.Value));
-                    connection.Open();
-                    result = command.ExecuteNonQuery();
+                    using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.DeleteFromTable.ToString()
+                               , connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@TableName", table);
+                        command.Parameters.AddWithValue("@ColumnName", column);
+                        command.Parameters.AddWithValue("@UserColumnInput",CheckForDbnull(whereClause.Value));
+                        connection.Open();
+                        result = command.ExecuteNonQuery();
+                    }
                 }
             }
-            
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error Happen: {e}");
+                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
+                throw;
+            }
             
             return result;
         }
