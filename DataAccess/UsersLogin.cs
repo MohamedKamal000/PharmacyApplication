@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
+using Dapper;
 
 namespace DataAccess
 {
@@ -17,22 +19,25 @@ namespace DataAccess
     
     public class UsersLogin
     {
-        private static DataTable RetrieveUserCredentials(string phoneNumber)
+        private static Users RetrieveUserCredentials(string phoneNumber)
         {
-            DataTable dt = new DataTable();
+            Users user = new Users();
             try
             {
-                using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
-                {
-                    using (SqlCommand command = new SqlCommand(DBSettings.ProceduresNames.UserLogin.ToString(),
-                               connection))
+                IDbConnection dbConnection = new SqlConnection(DBSettings.connectionString);
+
+                user = dbConnection.Query<Users>(
+                    DBSettings.ProceduresNames.UserLogin.ToString(),
+                    new
                     {
-                        connection.Open();
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
-                        SqlDataReader reader = command.ExecuteReader();
-                        dt.Load(reader);
-                    }
+                        PhoneNumber = phoneNumber
+                    },
+                    commandType: CommandType.StoredProcedure
+                    ).Single();
+
+                if (user.PhoneNumber.Length == 0)
+                {
+                    user = null;
                 }
             }
             catch (Exception e)
@@ -41,7 +46,7 @@ namespace DataAccess
                 DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
             }
                 
-            return dt;
+            return user;
         }
         public static bool Login(string phoneNumber, string password,out IUserRole userRole)
         {
@@ -50,17 +55,14 @@ namespace DataAccess
 
             try
             {
-                using (DataTable dt = RetrieveUserCredentials(phoneNumber))
+                Users user = RetrieveUserCredentials(phoneNumber);
+                PasswordHasher passwordHasher = new PasswordHasher();
+                if (user != null && passwordHasher.Verify(password, user.Password))
                 {
-                    PasswordHasher passwordHasher = new PasswordHasher();
-                    if (dt.Rows.Count != 0 && passwordHasher.Verify(
-                            password, (string)dt.Rows[0]["Password"]))
-                    {
-                        userRole = (bool)dt.Rows[0]["Role"]
-                            ? new Admin((string)dt.Rows[0]["PhoneNumber"]) as IUserRole
-                            : new User((string)dt.Rows[0]["PhoneNumber"]) as IUserRole;
-                        isOK = true;
-                    }
+                    userRole = user.Role
+                        ? new Admin(user.PhoneNumber) as IUserRole
+                        : new User(user.PhoneNumber) as IUserRole;
+                    isOK = true;
                 }
             }
             catch (Exception e)
@@ -72,54 +74,53 @@ namespace DataAccess
             return isOK;
         }
 
-        public static int RegisterNewUser(Dictionary<Users, object> values)
+        public static int RegisterNewUser(Users user)
         {
             // Make Input Validator class later to check for values Entered and size of it and missing values
             PasswordHasher passwordHasher = new PasswordHasher();
-            values[Users.Password] = passwordHasher.Hash((string) values[Users.Password]);
-            return TableManager<Users>.InsertIntoTable(values);
+            user.Password = passwordHasher.Hash(user.Password);
+            return TableManager<Users>.InsertIntoTable(user);
         }
-        public static bool ChangePassword(KeyValuePair<Users, string> newPassword, IUserRole user, string oldPassword)
+        
+        public static bool ChangePassword(IUserRole userSession, string newPassword,string oldPassword)
         {
             bool isOk = false;
 
-            DataTable dt = RetrieveUserCredentials(user.IdentifyUser());
+            Users user = RetrieveUserCredentials(userSession.IdentifyUser());
 
-            if (dt.Columns.Count == 0) return isOk;
+            if (user == null) return isOk;
 
 
             PasswordHasher passwordHasher = new PasswordHasher();
 
-            if (!passwordHasher.Verify(oldPassword, (string)dt.Rows[0]["Password"])) return isOk;
+            if (!passwordHasher.Verify(oldPassword, user.Password)) return isOk;
             
             // User Input Validator to see the new password is empty or not and ensure the key is password
             // should check that in the beginning of the function
 
+            user.Password = passwordHasher.Hash(user.Password);
             int result = TableManager<Users>.UpdateTable(
-                new KeyValuePair<Users, object>(Users.PhoneNumber, user.IdentifyUser()),
-                new Dictionary<Users,object>()
-                {
-                    { newPassword.Key, newPassword.Value }
-                } );
+                new KeyValuePair<string, object>("PhoneNumber", userSession.IdentifyUser()),
+                user);
 
             isOk = result != -1;
 
             return isOk;
         }
-        public static bool DeleteAccount(IUserRole user, string password)
+        public static bool DeleteAccount(IUserRole userSession, string password)
         {
             bool isOk = false;
 
-            DataTable dt = RetrieveUserCredentials(user.IdentifyUser());
+            Users user = RetrieveUserCredentials(userSession.IdentifyUser());
 
-            if (dt.Columns.Count == 0) return isOk;
+            if (user == null) return isOk;
 
             PasswordHasher passwordHasher = new PasswordHasher();
 
-            if (!passwordHasher.Verify(password, (string)dt.Rows[0]["Password"])) return isOk;
+            if (!passwordHasher.Verify(password, user.Password)) return isOk;
 
-            int result = TableManager<Users>.DeleteFromTable(new KeyValuePair<Users, object>(Users.PhoneNumber,
-                user.IdentifyUser()));
+            int result = TableManager<Users>.DeleteFromTable(new KeyValuePair<string, object>("PhoneNumber",
+                userSession.IdentifyUser()));
 
             isOk = result != -1;
             return isOk;

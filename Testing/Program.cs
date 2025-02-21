@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Reflection;
+
 
 
 namespace Testing
@@ -10,24 +13,20 @@ namespace Testing
     {
         public static void Main(string[] args)
         {
-            /*PasswordHasher passwordHasher = new PasswordHasher();
-            int result = TableManager<Users>.InsertIntoTable(new Dictionary<Users, object>()
-            {
-                { Users.PhoneNumber , "0122"},
-                { Users.Email , "LolForExam"},
-                { Users.UserName , "Sayeed"},
-                { Users.Password , passwordHasher.Hash("HelloWorld")},
-                { Users.Role , false}
-            });*/
 
-            try
+            Users user = new Users()
             {
-                throw new Exception("Hi");
-            }
-            catch (Exception e)
-            {
-                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
-            }
+                UserName = "Salah",
+                PhoneNumber = "013334",
+                Password = "Lol___",
+                Role = true
+            };
+
+            UsersLogin.Login(user.PhoneNumber, user.Password,out IUserRole use);
+
+            bool r = UsersLogin.ChangePassword(use, "HamadaHelal",user.Password);
+            
+            Console.WriteLine(r);
         }
     }
 }
