@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 namespace DataAccess
 {
-    public class PasswordHasher
+    public class PasswordHasher : IPasswordHasher
     {
         private  const int HASHSIZE = 32;
         private  const int SALTSIZE = 16;

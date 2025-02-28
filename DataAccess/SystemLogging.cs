@@ -4,9 +4,9 @@ using System.Diagnostics;
 
 namespace DataAccess
 {
-    public static class DB_Logging 
+    public  class DataBase_Logger : ILogger
     {
-        public static void LogAdminBehaviour(string adminIdentity, string logMessage)
+        public  void LogAdminBehaviour(string adminIdentity, string logMessage)
         {
             string query = @"Insert Into SystemAdminTracking(AdminPhoneIdentifier,AccessDate,BehaviourLog)
                             Values(
@@ -30,7 +30,7 @@ namespace DataAccess
             }
         }
 
-        public static void LogErrorMessage(string errorMessage, string errorStack)
+        public  void LogErrorMessage(string errorMessage, string errorStack)
         {
             string query = @"Insert Into SystemErrors(ErrorMessage, ErrorStack,ErrorDate)
                             Values(

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
 using System.Reflection;
 using Dapper;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DataAccess
@@ -13,6 +11,15 @@ namespace DataAccess
     public class TableManager<TObject> where TObject : class
     {
         // used only in Insertion
+        private readonly IDbConnection _dbConnection;
+        private readonly ILogger _logger;
+        
+        public TableManager(IDbConnection dbConnection,ILogger logger)
+        {
+            _dbConnection = dbConnection;
+            _logger = logger;
+        }
+        
         private static string ToSqlTypeConvertor(object value)
         {
             if (value == null) return "NULL";
@@ -35,20 +42,18 @@ namespace DataAccess
             return value ?? DBNull.Value;
         }
         
-        public static int InsertIntoTable(TObject rowInserted)
+        public int InsertIntoTable(TObject rowInserted)
         {
             int resultID = -1;
             string table = typeof(TObject).Name;
             Type tableType = typeof(TObject);
-            PropertyInfo[] prop = tableType.GetProperties();
+            PropertyInfo[] prop = tableType.GetProperties().Where(p => p.Name != "Id").ToArray();
             string columns = string.Join(",",prop.Select(x => x.Name));
             string values = string.Join(",",prop.Select(x => ToSqlTypeConvertor(x.GetValue(rowInserted))));
 
             try
             {
-                IDbConnection dbConnection = new SqlConnection(DBSettings.connectionString);
-
-                resultID = dbConnection.ExecuteScalar<int>(
+                resultID = _dbConnection.ExecuteScalar<int>(
                     DBSettings.ProceduresNames.InsertIntoAnyTable.ToString(),
                     new
                     {
@@ -62,16 +67,15 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error Happen: {e}");
-                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
-                throw;
+                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                throw new Exception("Insertion Failed");
             }
             
             return resultID;
         }
         
         // does not work for null values i may make one that work for nulls 
-        public static bool SelectFromTable(KeyValuePair<string, object> whereClauseConstruction, out List<TObject> dt)
+        public  bool SelectFromTable(KeyValuePair<string, object> whereClauseConstruction, out List<TObject> dt)
         {
             bool isOK = false;
             string table = typeof(TObject).Name;
@@ -79,9 +83,7 @@ namespace DataAccess
 
             try
             {
-                IDbConnection dbConnection = new SqlConnection(DBSettings.connectionString);
-
-                dt = dbConnection.Query<TObject>(
+                dt = _dbConnection.Query<TObject>(
                     DBSettings.ProceduresNames.SelectFromTable.ToString(),
                     new
                     {
@@ -96,16 +98,15 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error Happen: {e}");
-                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
-                throw;
+                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                throw new Exception("Selection From Table Failed");
             }
             
 
             return isOK;
         }
         
-        public static int UpdateTable(KeyValuePair<string, object> whereClause, TObject rowsUpdated)
+        public  int UpdateTable(KeyValuePair<string, object> whereClause, TObject rowsUpdated)
         {
             int result = -1;
             string table = typeof(TObject).Name;
@@ -117,7 +118,7 @@ namespace DataAccess
             foreach (PropertyInfo p in prop)
             {
                 var value = p.GetValue(rowsUpdated);
-                if (value != null)
+                if (value != null && p.Name != "Id")
                 {
                     updates.Add(p.Name,value);
                 }
@@ -134,9 +135,7 @@ namespace DataAccess
             
             try
             {
-                IDbConnection dbConnection = new SqlConnection(DBSettings.connectionString);
-
-                result = dbConnection.Execute(
+                result = _dbConnection.Execute(
                     DBSettings.ProceduresNames.UpdateTable.ToString(),
                     new
                     {
@@ -150,15 +149,14 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error Happen: {e}");
-                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
-                throw;
+                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                throw new Exception("Update of Row Failed");
             }
             
             return result;
         }
 
-        public static int DeleteFromTable(KeyValuePair<string, object> whereClause)
+        public  int DeleteFromTable(KeyValuePair<string, object> whereClause)
         {
             int result = -1;
             string table = typeof(TObject).Name;
@@ -166,9 +164,7 @@ namespace DataAccess
 
             try
             {
-                IDbConnection dbConnection = new SqlConnection(DBSettings.connectionString);
-
-                result = dbConnection.Execute(
+                result = _dbConnection.Execute(
                     DBSettings.ProceduresNames.DeleteFromTable.ToString(),
                     new
                     {
@@ -182,9 +178,8 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error Happen: {e}");
-                DB_Logging.LogErrorMessage(e.Message,e.StackTrace);
-                throw;
+                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                throw new Exception("Deletion Of Row Failed");
             }
             
             return result;
