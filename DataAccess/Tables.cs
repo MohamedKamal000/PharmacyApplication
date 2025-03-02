@@ -1,7 +1,9 @@
 ﻿using System;
 
+
 namespace DataAccess
 {
+   
     public class Users
     {
         public int Id { get; private set; } = -1;

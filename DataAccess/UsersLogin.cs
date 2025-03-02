@@ -20,46 +20,16 @@ namespace DataAccess
     public class UsersLogin
     {
         private readonly ILogger _logger;
-        private readonly TableManager<Users> _usersTableManager;
+        private readonly IUserRepository<Users> _usersGenericRepository;
         private readonly IPasswordHasher _passwordHasher;
         
-        UsersLogin(ILogger logger,TableManager<Users> usersTableManager,IPasswordHasher passwordHasher)
+        UsersLogin(ILogger logger,IUserRepository<Users> usersGenericRepository,IPasswordHasher passwordHasher)
         {
             _logger = logger;
-            _usersTableManager = usersTableManager;
+            _usersGenericRepository = usersGenericRepository;
             _passwordHasher = passwordHasher;
         }
         
-        // idk but this breaks the Dependency Inversion Principle 
-        private  Users RetrieveUserCredentials(string phoneNumber)
-        {
-            Users user = new Users();
-            try
-            {
-                IDbConnection dbConnection = new SqlConnection(DBSettings.connectionString);
-
-                user = dbConnection.Query<Users>(
-                    DBSettings.ProceduresNames.UserLogin.ToString(),
-                    new
-                    {
-                        PhoneNumber = phoneNumber
-                    },
-                    commandType: CommandType.StoredProcedure
-                    ).Single();
-
-                if (user.PhoneNumber.Length == 0)
-                {
-                    user = null;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error Happen: {e}");
-                _logger.LogErrorMessage(e.Message,e.StackTrace);
-            }
-                
-            return user;
-        }
         public  bool Login(string phoneNumber, string password,out IUserRole userRole)
         {
             bool isOK = false;
@@ -67,7 +37,7 @@ namespace DataAccess
 
             try
             {
-                Users user = RetrieveUserCredentials(phoneNumber);
+                Users user = _usersGenericRepository.RetrieveUserCredentials(phoneNumber);
                 if (user != null && _passwordHasher.Verify(password, user.Password))
                 {
                     userRole = user.Role
@@ -89,14 +59,14 @@ namespace DataAccess
         {
             // Make Input Validator class later to check for values Entered and size of it and missing values
             user.Password = _passwordHasher.Hash(user.Password);
-            return _usersTableManager.InsertIntoTable(user);
+            return _usersGenericRepository.Add(user);
         }
         
         public  bool ChangePassword(IUserRole userSession, string newPassword,string oldPassword)
         {
             bool isOk = false;
 
-            Users user = RetrieveUserCredentials(userSession.IdentifyUser());
+            Users user = _usersGenericRepository.RetrieveUserCredentials(userSession.IdentifyUser());
 
             if (user == null) return isOk;
             
@@ -107,7 +77,7 @@ namespace DataAccess
             // should check that in the beginning of the function
 
             user.Password = _passwordHasher.Hash(user.Password);
-            int result = _usersTableManager.UpdateTable(
+            int result = _usersGenericRepository.Update(
                 new KeyValuePair<string, object>("PhoneNumber", userSession.IdentifyUser()),
                 user);
 
@@ -119,14 +89,14 @@ namespace DataAccess
         {
             bool isOk = false;
 
-            Users user = RetrieveUserCredentials(userSession.IdentifyUser());
+            Users user = _usersGenericRepository.RetrieveUserCredentials(userSession.IdentifyUser());
 
             if (user == null) return isOk;
             
 
             if (!_passwordHasher.Verify(password, user.Password)) return isOk;
 
-            int result = _usersTableManager.DeleteFromTable(new KeyValuePair<string, object>("PhoneNumber",
+            int result = _usersGenericRepository.Delete(new KeyValuePair<string, object>("PhoneNumber",
                 userSession.IdentifyUser()));
 
             isOk = result != -1;

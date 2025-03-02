@@ -8,13 +8,13 @@ using Newtonsoft.Json.Linq;
 
 namespace DataAccess
 {
-    public class TableManager<TObject> where TObject : class
+    public class GenericRepository<TObject> : IRepository<TObject> where TObject : class
     {
         // used only in Insertion
-        private readonly IDbConnection _dbConnection;
-        private readonly ILogger _logger;
+        protected readonly IDbConnection _dbConnection;
+        protected readonly ILogger _logger;
         
-        public TableManager(IDbConnection dbConnection,ILogger logger)
+        public GenericRepository(IDbConnection dbConnection,ILogger logger)
         {
             _dbConnection = dbConnection;
             _logger = logger;
@@ -42,7 +42,7 @@ namespace DataAccess
             return value ?? DBNull.Value;
         }
         
-        public int InsertIntoTable(TObject rowInserted)
+        public int Add(TObject rowInserted)
         {
             int resultID = -1;
             string table = typeof(TObject).Name;
@@ -75,12 +75,13 @@ namespace DataAccess
         }
         
         // does not work for null values i may make one that work for nulls 
-        public  bool SelectFromTable(KeyValuePair<string, object> whereClauseConstruction, out List<TObject> dt)
+        public  bool Get(KeyValuePair<string, object> whereClauseConstruction, out IEnumerable<TObject> dt)
         {
             bool isOK = false;
             string table = typeof(TObject).Name;
             string column = whereClauseConstruction.Key;
-
+            dt = Enumerable.Empty<TObject>();
+            
             try
             {
                 dt = _dbConnection.Query<TObject>(
@@ -94,7 +95,7 @@ namespace DataAccess
                     commandType: CommandType.StoredProcedure
                 ).ToList();
 
-                isOK = dt.Count != 0;
+                isOK = dt.Any();
             }
             catch (Exception e)
             {
@@ -106,7 +107,7 @@ namespace DataAccess
             return isOK;
         }
         
-        public  int UpdateTable(KeyValuePair<string, object> whereClause, TObject rowsUpdated)
+        public  int Update(KeyValuePair<string, object> whereClause, TObject rowsUpdated)
         {
             int result = -1;
             string table = typeof(TObject).Name;
@@ -156,7 +157,7 @@ namespace DataAccess
             return result;
         }
 
-        public  int DeleteFromTable(KeyValuePair<string, object> whereClause)
+        public  int Delete(KeyValuePair<string, object> whereClause)
         {
             int result = -1;
             string table = typeof(TObject).Name;
