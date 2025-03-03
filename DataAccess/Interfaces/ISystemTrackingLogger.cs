@@ -1,6 +1,6 @@
 ﻿namespace DataAccess
 {
-    public interface ILogger
+    public interface ISystemTrackingLogger
     {
         void LogAdminBehaviour(string adminIdentity,string logMessage);
         

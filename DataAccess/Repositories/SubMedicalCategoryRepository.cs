@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using DataAccess.Interfaces;
+using System.Collections.Generic;
 using System.Data;
 
 namespace DataAccess
 {
     public class SubMedicalCategoryRepository : GenericRepository<SubMedicalCategory>, IExtendedRepository<SubMedicalCategory>
     {
-        public SubMedicalCategoryRepository(IDbConnection dbConnection, ILogger logger) : base(dbConnection, logger)
+        public SubMedicalCategoryRepository(IConnection dbConnection, ISystemTrackingLogger systemTrackingLogger) : base(dbConnection, systemTrackingLogger)
         {
         }
 

@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using DataAccess.Interfaces;
+using System.Collections.Generic;
 using System.Data;
 
 namespace DataAccess
 {
     public class MedicalProductsRepository : GenericRepository<MedicalProducts>, IExtendedRepository<MedicalProducts>
     {
-        public MedicalProductsRepository(IDbConnection dbConnection, ILogger logger) : base(dbConnection, logger)
+        public MedicalProductsRepository(IConnection dbConnection, ISystemTrackingLogger systemTrackingLogger) : base(dbConnection, systemTrackingLogger)
         {
         }
 

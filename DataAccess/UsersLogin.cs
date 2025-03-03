@@ -19,13 +19,13 @@ namespace DataAccess
     
     public class UsersLogin
     {
-        private readonly ILogger _logger;
+        private readonly ISystemTrackingLogger _systemTrackingLogger;
         private readonly IUserRepository<Users> _usersGenericRepository;
         private readonly IPasswordHasher _passwordHasher;
         
-        UsersLogin(ILogger logger,IUserRepository<Users> usersGenericRepository,IPasswordHasher passwordHasher)
+        public UsersLogin(ISystemTrackingLogger systemTrackingLogger,IUserRepository<Users> usersGenericRepository,IPasswordHasher passwordHasher)
         {
-            _logger = logger;
+            _systemTrackingLogger = systemTrackingLogger;
             _usersGenericRepository = usersGenericRepository;
             _passwordHasher = passwordHasher;
         }
@@ -49,7 +49,7 @@ namespace DataAccess
             catch (Exception e)
             {
                 Console.WriteLine($"Error Happen: {e}");
-                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                _systemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
             }
             
             return isOK;
@@ -101,6 +101,16 @@ namespace DataAccess
 
             isOk = result != -1;
             return isOk;
+        }
+
+        public Users GetUser(string phoneNumber)
+        {
+            Users user = _usersGenericRepository.RetrieveUserCredentials(phoneNumber);
+
+            user.Password = "";
+
+
+            return user;
         }
     }
 }

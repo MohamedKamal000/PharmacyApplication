@@ -2,13 +2,14 @@
 using System.Data;
 using System.Linq;
 using Dapper;
+using DataAccess.Interfaces;
 
 namespace DataAccess
 {
     public class UserRepository : GenericRepository<Users>, IUserRepository<Users>
     {
         
-        public UserRepository(IDbConnection connection, ILogger logger) : base(connection, logger)
+        public UserRepository(IConnection connection, ISystemTrackingLogger systemTrackingLogger) : base(connection, systemTrackingLogger)
         {
             
         }
@@ -42,7 +43,7 @@ namespace DataAccess
             catch (Exception e)
             {
                 Console.WriteLine($"Error Happen: {e}");
-                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
             }
                 
             return user;

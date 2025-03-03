@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using Dapper;
+using DataAccess.Interfaces;
 using Newtonsoft.Json.Linq;
 
 namespace DataAccess
@@ -12,12 +13,12 @@ namespace DataAccess
     {
         // used only in Insertion
         protected readonly IDbConnection _dbConnection;
-        protected readonly ILogger _logger;
+        protected readonly ISystemTrackingLogger SystemTrackingLogger;
         
-        public GenericRepository(IDbConnection dbConnection,ILogger logger)
+        public GenericRepository(IConnection dbConnection,ISystemTrackingLogger systemTrackingLogger)
         {
-            _dbConnection = dbConnection;
-            _logger = logger;
+            _dbConnection = dbConnection.CreateConnection();
+            SystemTrackingLogger = systemTrackingLogger;
         }
         
         private static string ToSqlTypeConvertor(object value)
@@ -67,7 +68,7 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
                 throw new Exception("Insertion Failed");
             }
             
@@ -99,7 +100,7 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
                 throw new Exception("Selection From Table Failed");
             }
             
@@ -150,7 +151,7 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
                 throw new Exception("Update of Row Failed");
             }
             
@@ -179,7 +180,7 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                _logger.LogErrorMessage(e.Message,e.StackTrace);
+                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
                 throw new Exception("Deletion Of Row Failed");
             }
             

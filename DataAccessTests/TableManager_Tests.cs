@@ -23,7 +23,7 @@ namespace DataAccessTests
                 null,
                 It.IsAny<CommandType>())).Returns(1);
 
-            var moq_logger = new Mock<DataBase_Logger>();
+            var moq_logger = new Mock<DataBaseSystemTrackingLogger>();
 
             moq_logger.Setup(l => l.LogErrorMessage(It.IsAny<string>(), It.IsAny<string>()));
             

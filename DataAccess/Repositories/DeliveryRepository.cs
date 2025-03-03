@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using DataAccess.Interfaces;
 
 namespace DataAccess
 {
     public class DeliveryRepository : GenericRepository<Delivery>, IExtendedRepository<Delivery>
     {
-        public DeliveryRepository(IDbConnection dbConnection, ILogger logger) : base(dbConnection, logger)
+        public DeliveryRepository(IConnection dbConnection, ISystemTrackingLogger systemTrackingLogger) : base(dbConnection, systemTrackingLogger)
         {
         }
 

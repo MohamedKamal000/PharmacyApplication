@@ -1,11 +1,21 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using Dapper;
+using DataAccess.Interfaces;
 
 namespace DataAccess
 {
-    public  class DataBase_Logger : ILogger
+    public  class DataBaseSystemTrackingLogger : ISystemTrackingLogger
     {
+
+        private readonly IConnection _dbConnection;
+        public DataBaseSystemTrackingLogger(IConnection dpConnection)
+        {
+            _dbConnection = dpConnection;
+        }
+
         public  void LogAdminBehaviour(string adminIdentity, string logMessage)
         {
             string query = @"Insert Into SystemAdminTracking(AdminPhoneIdentifier,AccessDate,BehaviourLog)
@@ -15,19 +25,19 @@ namespace DataAccess
                             @Behaviour
                             )";
 
-            using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
-            {
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@AdminIdentifier", adminIdentity);
-                    command.Parameters.AddWithValue("@Date", DateTime.Now);
-                    command.Parameters.AddWithValue("@Behaviour", logMessage);
-                    
-                    connection.Open();
+            IDbConnection connection = _dbConnection.CreateConnection();
+            
 
-                    command.ExecuteNonQuery();
-                }
-            }
+            connection.Execute(
+                query,
+                    new
+                    {
+                        AdminIdentifier = adminIdentity,
+                        Date = DateTime.Now,
+                        Behaviour = logMessage
+                    },
+                commandType: CommandType.Text
+                );
         }
 
         public  void LogErrorMessage(string errorMessage, string errorStack)
@@ -39,19 +49,21 @@ namespace DataAccess
                             @ErrorDate
                             )";
 
-            using (SqlConnection connection = new SqlConnection(DBSettings.connectionString))
-            {
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@ErrorMessage", errorMessage);
-                    command.Parameters.AddWithValue("@ErrorDate", DateTime.Now);
-                    command.Parameters.AddWithValue("@ErrorStack", errorStack);
-                    
-                    connection.Open();
 
-                    command.ExecuteNonQuery();
-                }
-            }
+            IDbConnection connection = _dbConnection.CreateConnection();
+
+
+            connection.Execute(
+                query,
+                new
+                {
+                    ErrorMessage = errorMessage,
+                    ErrorDate = DateTime.Now,
+                    ErrorStack = errorStack
+                },
+                commandType: CommandType.Text
+            );
+
         }
         
         
