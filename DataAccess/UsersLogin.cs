@@ -107,9 +107,6 @@ namespace DataAccess
         {
             Users user = _usersGenericRepository.RetrieveUserCredentials(phoneNumber);
 
-            user.Password = "";
-
-
             return user;
         }
     }

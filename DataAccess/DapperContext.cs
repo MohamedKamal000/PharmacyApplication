@@ -1,16 +1,24 @@
 ﻿
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using DataAccess.Interfaces;
+using Microsoft.Extensions.Configuration;
+
+
 namespace DataAccess
 {
     public class DapperContext : IConnection
     {
-        private readonly string connectionString;
+        public readonly string connectionString;
 
         public DapperContext()
         {
-            connectionString = "Server=.;Database=PharmacyApplication;User Id=sa;Password=sa123456;";
+            var configurationBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appSettings.json").Build();
+
+            connectionString = configurationBuilder.GetConnectionString("SqlConnection");
         }
 
         public IDbConnection CreateConnection()

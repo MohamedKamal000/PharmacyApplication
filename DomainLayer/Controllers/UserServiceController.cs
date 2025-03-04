@@ -27,10 +27,8 @@ namespace DomainLayer.Controllers
             {
                 return Ok(resultID);
             }
-            else
-            {
-                return BadRequest();
-            }
+            
+            return BadRequest();
         }
 
         [HttpGet]
@@ -53,6 +51,16 @@ namespace DomainLayer.Controllers
             };
 
             return Ok(user_dto);
+        }
+
+
+        [HttpPost]
+        [Route("Login")]
+        public ActionResult<IUserRole> Login([FromForm] string phoneNumber,[FromForm] string password)
+        {
+            var requestResult = _usersLogin.Login(phoneNumber, password, out IUserRole userRole);
+
+            return requestResult ? Ok(userRole.GetUserRole()) : BadRequest();
         }
     }
 }

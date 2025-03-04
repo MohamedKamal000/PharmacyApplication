@@ -33,12 +33,8 @@ namespace DataAccess
                         PhoneNumber = phoneNumber
                     },
                     commandType: CommandType.StoredProcedure
-                ).Single();
+                ).SingleOrDefault();
 
-                if (user.PhoneNumber.Length == 0)
-                {
-                    user = null;
-                }
             }
             catch (Exception e)
             {
