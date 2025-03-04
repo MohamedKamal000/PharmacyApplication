@@ -1,8 +1,7 @@
 ﻿
 using System.Data;
-using System.Data.SqlClient;
-using System.IO;
 using DataAccess.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 
@@ -10,15 +9,16 @@ namespace DataAccess
 {
     public class DapperContext : IConnection
     {
-        public readonly string connectionString;
+        private readonly string? connectionString;
 
         public DapperContext()
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appSettings.json").Build();
+                .AddJsonFile("appsettings.json").Build();
 
             connectionString = configurationBuilder.GetConnectionString("SqlConnection");
+            Console.WriteLine(connectionString);
         }
 
         public IDbConnection CreateConnection()
