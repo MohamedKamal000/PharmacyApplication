@@ -1,5 +1,6 @@
 using DataAccess;
 using DataAccess.Interfaces;
+using DomainLayer.middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IConnection, DapperContext>();
-builder.Services.AddScoped<ISystemTrackingLogger, DataBaseSystemTrackingLogger>();
+builder.Services.AddSingleton<ISystemTrackingLogger, DataBaseSystemTrackingLogger>();
 builder.Services.AddScoped<IUserRepository<Users>, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<UsersLogin>();
@@ -27,6 +28,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<RequestTimeMeasurementMiddleWare>();
+app.UseMiddleware<GlobalErrorHandlerMiddleWare>();
 
 app.MapControllers();
 

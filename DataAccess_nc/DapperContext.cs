@@ -18,7 +18,6 @@ namespace DataAccess
                 .AddJsonFile("appsettings.json").Build();
 
             connectionString = configurationBuilder.GetConnectionString("SqlConnection");
-            Console.WriteLine(connectionString);
         }
 
         public IDbConnection CreateConnection()

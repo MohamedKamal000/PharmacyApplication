@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
+using DataAccess.Interfaces;
 
 namespace DataAccess
 {
@@ -35,22 +36,16 @@ namespace DataAccess
             bool isOK = false;
             userRole = null;
 
-            try
+            
+            Users user = _usersGenericRepository.RetrieveUserCredentials(phoneNumber);
+            if (user != null && _passwordHasher.Verify(password, user.Password))
             {
-                Users user = _usersGenericRepository.RetrieveUserCredentials(phoneNumber);
-                if (user != null && _passwordHasher.Verify(password, user.Password))
-                {
-                    userRole = user.Role
-                        ? new Admin(user.PhoneNumber) as IUserRole
-                        : new User(user.PhoneNumber) as IUserRole;
-                    isOK = true;
-                }
+                userRole = user.Role
+                    ? new Admin(user.PhoneNumber) as IUserRole
+                    : new User(user.PhoneNumber) as IUserRole;
+                isOK = true;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error Happen: {e}");
-                _systemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
-            }
+            
             
             return isOK;
         }
