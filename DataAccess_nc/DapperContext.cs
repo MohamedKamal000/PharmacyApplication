@@ -20,6 +20,7 @@ namespace DataAccess
             connectionString = configurationBuilder.GetConnectionString("SqlConnection");
         }
 
+
         public IDbConnection CreateConnection()
         {
             return new SqlConnection(connectionString);

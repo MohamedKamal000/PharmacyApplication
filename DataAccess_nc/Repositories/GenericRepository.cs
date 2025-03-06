@@ -107,20 +107,20 @@ namespace DataAccess
 
             return isOK;
         }
-        
+
         public  int Update(KeyValuePair<string, object> whereClause, TObject rowsUpdated)
         {
             int result = -1;
             string table = typeof(TObject).Name;
             string column = whereClause.Key;
-            PropertyInfo[] prop = typeof(TObject).GetProperties();
+            PropertyInfo[] prop = typeof(TObject).GetProperties().Where(p => p.Name != "Id").ToArray();
 
             Dictionary<string, object> updates = new Dictionary<string, object>();
             
             foreach (PropertyInfo p in prop)
             {
                 var value = p.GetValue(rowsUpdated);
-                if (value != null && p.Name != "Id")
+                if (value != null)
                 {
                     updates.Add(p.Name,value);
                 }
@@ -186,6 +186,37 @@ namespace DataAccess
             
             return result;
         }
-        
+
+
+        public bool CheckExist(KeyValuePair<string, object> whereClause)
+        {
+            bool isOk = false;
+            string tableName = typeof(TObject).Name;
+            string column = whereClause.Key;
+            object value = whereClause.Value;
+
+            try
+            {
+                int result = _dbConnection.ExecuteScalar<int>(
+                    DBSettings.ProceduresNames.CheckRowInTable.ToString(),
+                    new
+                    {
+                        TableName = tableName,
+                        ColumnName = column,
+                        Value = value
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                isOk = result != 0;
+            }
+            catch (Exception e)
+            {
+                SystemTrackingLogger.LogErrorMessage(e.Message, e.StackTrace);
+                throw;
+            }
+
+            return isOk;
+        }
     }
 }

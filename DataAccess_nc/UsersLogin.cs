@@ -53,6 +53,8 @@ namespace DataAccess
         public  int RegisterNewUser(Users user)
         {
             // Make Input Validator class later to check for values Entered and size of it and missing values
+            if (!user.PhoneNumber.All(char.IsDigit)) return -1;
+
             user.Password = _passwordHasher.Hash(user.Password);
             return _usersGenericRepository.Add(user);
         }
@@ -103,6 +105,12 @@ namespace DataAccess
             Users user = _usersGenericRepository.RetrieveUserCredentials(phoneNumber);
 
             return user;
+        }
+
+
+        public bool CheckUserExist(string phoneNumber)
+        {
+            return _usersGenericRepository.CheckExist(new KeyValuePair<string, object>("PhoneNumber", phoneNumber));
         }
     }
 }

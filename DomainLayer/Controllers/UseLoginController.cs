@@ -8,11 +8,11 @@ namespace DomainLayer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserServiceController : ControllerBase
+    public class UseLoginController : ControllerBase
     {
         private readonly UsersLogin _usersLogin;
 
-        public UserServiceController(UsersLogin usersLogin)
+        public UseLoginController(UsersLogin usersLogin)
         {
             _usersLogin = usersLogin;
         }
@@ -20,14 +20,17 @@ namespace DomainLayer.Controllers
 
         [HttpPost]
         [Route("RegisterUser")]
-        public ActionResult<int> RegisterNewUser([FromForm] string phoneNumber,
-            [FromForm] string password,[FromForm] string userName)
+        public ActionResult<int> RegisterNewUser(RegisterUserDto user_dto)
         {
+            if (!ModelState.IsValid) return BadRequest();
+            if (_usersLogin.CheckUserExist(user_dto.PhoneNumber)) return BadRequest("User Already Exist");
+
+
             Users user = new Users()
             {
-                PhoneNumber = phoneNumber,
-                Password = password,
-                UserName = userName,
+                PhoneNumber = user_dto.PhoneNumber,
+                Password = user_dto.Password,
+                UserName = user_dto.UserName,
                 Role = false
             };
 
@@ -38,13 +41,21 @@ namespace DomainLayer.Controllers
             {
                 return Ok(resultID);
             }
-            
-            return BadRequest();
+
+            ProblemDetails problem = new ProblemDetails()
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Input Error",
+                Type = "Input Error",
+                Detail = "Phone Number is Invalid"
+            };
+
+            return BadRequest(problem);
         }
 
         [HttpGet]
         [Route("{phoneNumber}")]
-        public ActionResult<UserDto> GetUser(string phoneNumber)
+        public ActionResult<GetUserDto> GetUser(string phoneNumber)
         {
             Users? user = _usersLogin.GetUser(phoneNumber);
 
@@ -53,7 +64,7 @@ namespace DomainLayer.Controllers
                 return BadRequest();
             }
 
-            UserDto user_dto = new UserDto()
+            GetUserDto user_dto = new GetUserDto()
             {
                 Id = user.Id,
                 PhoneNumber = user.PhoneNumber,

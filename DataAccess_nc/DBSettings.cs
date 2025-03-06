@@ -11,7 +11,8 @@
             InsertIntoAnyTable,
             SelectFromTable,
             UpdateTable,
-            DeleteFromTable
+            DeleteFromTable,
+            CheckRowInTable
         }
     }
 }

@@ -38,12 +38,12 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error Happen: {e}");
                 SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
+                throw;
             }
                 
             return user;
         }
-       
+
     }
 }

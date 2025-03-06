@@ -8,5 +8,7 @@ namespace DataAccess
         int Update(KeyValuePair<string, object> whereClause, TObject obj);
         int Delete(KeyValuePair<string, object> whereClause);
         bool Get(KeyValuePair<string, object> whereClause, out IEnumerable<TObject> result);
+
+        bool CheckExist(KeyValuePair<string, object> whereClause);
     }
 }
