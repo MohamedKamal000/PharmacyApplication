@@ -4,6 +4,6 @@ namespace DataAccess
 {
     public interface IExtendedRepository<TObject> : IRepository<TObject>
     {
-        IEnumerable<TObject> GetAll();
+        IEnumerable<TObject>? GetAll();
     }
 }

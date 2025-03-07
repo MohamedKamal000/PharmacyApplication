@@ -12,7 +12,14 @@
             SelectFromTable,
             UpdateTable,
             DeleteFromTable,
-            CheckRowInTable
+            CheckRowInTable,
+            GetAllFromTable,
+            GetUserOrders
+        }
+
+        public enum Views
+        {
+            ShowAllOrdersDistinct
         }
     }
 }

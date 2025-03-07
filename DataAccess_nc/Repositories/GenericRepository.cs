@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DataAccess
 {
-    public class GenericRepository<TObject> : IRepository<TObject> where TObject : class
+    public class GenericRepository<TObject> : IRepository<TObject>,IExtendedRepository<TObject> where TObject : class
     {
         // used only in Insertion
         protected readonly IDbConnection _dbConnection;
@@ -217,6 +217,31 @@ namespace DataAccess
             }
 
             return isOk;
+        }
+
+        public IEnumerable<TObject>? GetAll()
+        {
+            string table = typeof(TObject).Name;
+            IEnumerable<TObject>? result = null;
+
+            try
+            {
+                result = _dbConnection.Query<TObject>(
+                    DBSettings.ProceduresNames.GetAllFromTable.ToString(),
+                    new
+                    {
+                        TableName = table
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+            catch (Exception e)
+            {
+                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
+                throw;
+            }
+
+            return result;
         }
     }
 }
