@@ -1,4 +1,4 @@
-﻿namespace DataAccess
+﻿namespace DomainLayer.Interfaces
 {
     public enum Roles
     {
@@ -13,7 +13,7 @@
         
     }
 
-    // this for session managmet later on, idk if possible or not but we will see 
+    // this for session management later on, idk if possible or not but we will see 
     public class User : IUserRole
     {
         private readonly string userPhone;

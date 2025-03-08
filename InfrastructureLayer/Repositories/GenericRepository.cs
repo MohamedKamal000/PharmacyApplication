@@ -1,24 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 using System.Reflection;
 using Dapper;
-using DataAccess.Interfaces;
+using DomainLayer.Interfaces;
+using DomainLayer.Interfaces.RepositoryIntefraces;
 using Newtonsoft.Json.Linq;
 
-namespace DataAccess
+namespace InfrastructureLayer.Repositories
 {
-    public class GenericRepository<TObject> : IRepository<TObject>,IExtendedRepository<TObject> where TObject : class
+    public class GenericRepository<TObject> : 
+        IRepository<TObject>,IExtendedRepository<TObject> where TObject : class
     {
         // used only in Insertion
         protected readonly IDbConnection _dbConnection;
-        protected readonly ISystemTrackingLogger SystemTrackingLogger;
         
-        public GenericRepository(IConnection dbConnection,ISystemTrackingLogger systemTrackingLogger)
+        public GenericRepository(IConnection dbConnection)
         {
             _dbConnection = dbConnection.CreateConnection();
-            SystemTrackingLogger = systemTrackingLogger;
         }
         
         private static string ToSqlTypeConvertor(object value)
@@ -68,8 +65,8 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
-                throw new Exception("Insertion Failed");
+                throw new Exception($"Insertion Failed, error Message{e.Message}" +
+                                    $"Error Stack: {e.StackTrace}");
             }
             
             return resultID;
@@ -100,8 +97,8 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
-                throw new Exception("Selection From Table Failed");
+                throw new Exception($"Reading Failed, error Message{e.Message}" +
+                                    $"Error Stack: {e.StackTrace}");
             }
             
 
@@ -151,8 +148,8 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
-                throw new Exception("Update of Row Failed");
+                throw new Exception($"Updating Failed, error Message{e.Message}" +
+                                    $"Error Stack: {e.StackTrace}");
             }
             
             return result;
@@ -180,8 +177,8 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
-                throw new Exception("Deletion Of Row Failed");
+                throw new Exception($"Deleting Failed, error Message{e.Message}" 
+                                    + $"Error Stack: {e.StackTrace}");
             }
             
             return result;
@@ -212,8 +209,8 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                SystemTrackingLogger.LogErrorMessage(e.Message, e.StackTrace);
-                throw;
+                throw new Exception($"CheckRow Failed, error Message{e.Message}" +
+                                    $"Error Stack: {e.StackTrace}");
             }
 
             return isOk;
@@ -237,8 +234,8 @@ namespace DataAccess
             }
             catch (Exception e)
             {
-                SystemTrackingLogger.LogErrorMessage(e.Message,e.StackTrace);
-                throw;
+                throw new Exception($"GetAll Failed, error Message{e.Message}" +
+                                    $"Error Stack: {e.StackTrace}");
             }
 
             return result;

@@ -1,4 +1,4 @@
-﻿namespace DataAccess
+﻿namespace DomainLayer.Interfaces
 {
     public interface IPasswordHasher
     {

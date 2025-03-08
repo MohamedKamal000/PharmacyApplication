@@ -1,7 +1,6 @@
 ﻿using System.Data;
 
-
-namespace DataAccess.Interfaces
+namespace DomainLayer.Interfaces
 {
     public interface IConnection
     {

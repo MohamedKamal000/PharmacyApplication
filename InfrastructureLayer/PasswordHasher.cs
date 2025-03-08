@@ -1,7 +1,7 @@
-﻿using System;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
+using DomainLayer.Interfaces;
 
-namespace DataAccess
+namespace InfrastructureLayer
 {
     public class PasswordHasher : IPasswordHasher
     {

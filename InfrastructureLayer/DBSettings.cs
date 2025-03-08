@@ -1,4 +1,4 @@
-﻿namespace DataAccess
+﻿namespace InfrastructureLayer
 {
     public static class DBSettings
     {

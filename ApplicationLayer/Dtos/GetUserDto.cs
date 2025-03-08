@@ -1,4 +1,4 @@
-﻿namespace DomainLayer.Dtos
+﻿namespace ApplicationLayer.Dtos
 {
     public class GetUserDto
     {

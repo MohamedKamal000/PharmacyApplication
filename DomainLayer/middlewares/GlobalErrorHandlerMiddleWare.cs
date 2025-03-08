@@ -1,17 +1,18 @@
 ﻿using System.Text.Json;
-using DataAccess;
-using DataAccess.Interfaces;
+using DomainLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DomainLayer.middlewares
+namespace PresentationLayer.middlewares
 {
     public class GlobalErrorHandlerMiddleWare
     {
         private readonly RequestDelegate _next;
+        private readonly ISystemTrackingLogger _logger;
 
-        public GlobalErrorHandlerMiddleWare(RequestDelegate next)
+        public GlobalErrorHandlerMiddleWare(RequestDelegate next,ISystemTrackingLogger logger)
         {
             _next = next;
+            _logger = logger;
         }
 
 
@@ -24,6 +25,7 @@ namespace DomainLayer.middlewares
             }
             catch(Exception e)
             {
+                _logger.LogErrorMessage(e.Message,"");
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
                 ProblemDetails problem = new ProblemDetails()

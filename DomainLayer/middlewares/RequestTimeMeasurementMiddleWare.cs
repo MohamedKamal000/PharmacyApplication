@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace DomainLayer.middlewares
+namespace PresentationLayer.middlewares
 {
     public class RequestTimeMeasurementMiddleWare
     {

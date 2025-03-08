@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using Dapper;
-using DataAccess.Interfaces;
+﻿using ApplicationLayer.Dtos;
+using DomainLayer;
+using DomainLayer.Interfaces;
+using DomainLayer.Interfaces.RepositoryIntefraces;
 
-namespace DataAccess
+namespace ApplicationLayer
 {
     // should consider adding any of the following features later on 
     
@@ -18,36 +15,33 @@ namespace DataAccess
     
     // Must Make The Input Validator 
     
-    public class UsersLogin
+    public class UserLogin
     {
-        private readonly ISystemTrackingLogger _systemTrackingLogger;
         private readonly IUserRepository<Users> _usersGenericRepository;
         private readonly IPasswordHasher _passwordHasher;
         
-        public UsersLogin(ISystemTrackingLogger systemTrackingLogger,IUserRepository<Users> usersGenericRepository,IPasswordHasher passwordHasher)
+        public UserLogin(IUserRepository<Users> usersGenericRepository,IPasswordHasher passwordHasher)
         {
-            _systemTrackingLogger = systemTrackingLogger;
             _usersGenericRepository = usersGenericRepository;
             _passwordHasher = passwordHasher;
         }
         
-        public  bool Login(string phoneNumber, string password,out IUserRole userRole)
+        public  bool Login(LoginUserDto userLoginDto,out IUserRole? userRole)
         {
-            bool isOK = false;
+            bool isOk = false;
             userRole = null;
-
             
-            Users user = _usersGenericRepository.RetrieveUserCredentials(phoneNumber);
-            if (user != null && _passwordHasher.Verify(password, user.Password))
+            Users? user = _usersGenericRepository.RetrieveUserCredentials(userLoginDto.PhoneNumber);
+            if (user != null && _passwordHasher.Verify(userLoginDto.Password, user.Password))
             {
                 userRole = user.Role
                     ? new Admin(user.PhoneNumber) as IUserRole
                     : new User(user.PhoneNumber) as IUserRole;
-                isOK = true;
+                isOk = true;
             }
             
             
-            return isOK;
+            return isOk;
         }
 
         public  int RegisterNewUser(Users user)
@@ -100,17 +94,11 @@ namespace DataAccess
             return isOk;
         }
 
-        public Users GetUser(string phoneNumber)
-        {
-            Users user = _usersGenericRepository.RetrieveUserCredentials(phoneNumber);
-
-            return user;
-        }
-
 
         public bool CheckUserExist(string phoneNumber)
         {
-            return _usersGenericRepository.CheckExist(new KeyValuePair<string, object>("PhoneNumber", phoneNumber));
+            return _usersGenericRepository.
+                CheckExist(new KeyValuePair<string, object>("PhoneNumber", phoneNumber));
         }
     }
 }

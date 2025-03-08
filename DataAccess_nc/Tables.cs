@@ -1,7 +1,4 @@
-﻿using System;
-
-
-namespace DataAccess
+﻿namespace DomainLayer
 {
    
     public class Users
@@ -26,9 +23,9 @@ namespace DataAccess
     {
         public int Id { get; private set; } = -1;
         
-        public int UserID { get; set; }
-        
-        public int ProductID { get; set; }
+        public Users User { get; set; }
+
+        public List<MedicalProducts> Products { get; set; } = new List<MedicalProducts>();
         
         public int DeliveryManID { get; set; }
         
@@ -41,6 +38,23 @@ namespace DataAccess
         public DateTime OrderDate { get; set; }
         
         public string Status { get; set; }
+
+        public override string ToString()
+        {
+            // Convert the list of products to a string
+            string productsString = string.Join(", ", Products.Select(p => p.ToString()));
+
+            // Build the final string representation
+            return $"Order ID: {Id}\n" +
+                   $"User: {User?.ToString() ?? "No User"}\n" +
+                   $"Products: [{productsString}]\n" +
+                   $"DeliveryManID: {DeliveryManID}\n" +
+                   $"Amount: {Amount}\n" +
+                   $"DeliveryPrice: {DeliveryPrice}\n" +
+                   $"TotalPrice: {TotalPrice}\n" +
+                   $"OrderDate: {OrderDate}\n" +
+                   $"Status: {Status}";
+        }
     }
 
     public class MedicalProducts
@@ -58,7 +72,11 @@ namespace DataAccess
         public int ProductCategory { get; set; }
         
         public int ProductSubCategory { get; set; }
-        
+
+        public override string ToString()
+        {
+            return $"Product ID: {Id}, Name: {ProductName}, Price: {Price}, Stock: {Stock}, Description: {ItemDescription}, Category: {ProductCategory}, SubCategory: {ProductSubCategory}";
+        }
     }
 
     public class Delivery

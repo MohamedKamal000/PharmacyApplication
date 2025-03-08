@@ -1,11 +1,8 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-using System.Text.Json;
-
-namespace DomainLayer.Filters
+namespace PresentationLayer.Filters
 {
     public class RegisterNewUserActionAttribute : ActionFilterAttribute
     {

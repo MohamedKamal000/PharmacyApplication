@@ -1,18 +1,18 @@
-﻿using DataAccess;
-using DomainLayer.Dtos;
-using DomainLayer.Filters;
-using Microsoft.AspNetCore.Http;
+﻿using ApplicationLayer;
+using ApplicationLayer.Dtos;
+using DomainLayer;
+using DomainLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DomainLayer.Controllers
+namespace PresentationLayer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UseLoginController : ControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly UsersLogin _usersLogin;
+        private readonly UserLogin _usersLogin;
 
-        public UseLoginController(UsersLogin usersLogin)
+        public AuthController(UserLogin usersLogin)
         {
             _usersLogin = usersLogin;
         }
@@ -53,35 +53,16 @@ namespace DomainLayer.Controllers
             return BadRequest(problem);
         }
 
-        [HttpGet]
-        [Route("{phoneNumber}")]
-        public ActionResult<GetUserDto> GetUser(string phoneNumber)
-        {
-            Users? user = _usersLogin.GetUser(phoneNumber);
-
-            if (user == null)
-            {
-                return BadRequest();
-            }
-
-            GetUserDto user_dto = new GetUserDto()
-            {
-                Id = user.Id,
-                PhoneNumber = user.PhoneNumber,
-                UserName = user.UserName,
-            };
-
-            return Ok(user_dto);
-        }
-
 
         [HttpPost]
         [Route("Login")]
-        public ActionResult<IUserRole> Login([FromForm] string phoneNumber,[FromForm] string password)
+        public ActionResult<IUserRole> Login(LoginUserDto userLoginDto)
         {
-            var requestResult = _usersLogin.Login(phoneNumber, password, out IUserRole userRole);
+            var requestResult = _usersLogin.Login(userLoginDto,out IUserRole? userRole);
 
-            return requestResult ? Ok(userRole.GetUserRole()) : BadRequest();
+            if (!requestResult || userRole == null) return BadRequest();
+
+            return Ok(userRole.GetUserRole());
         }
     }
 }

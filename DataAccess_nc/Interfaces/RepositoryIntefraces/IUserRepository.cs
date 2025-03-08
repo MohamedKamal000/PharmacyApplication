@@ -1,8 +1,8 @@
-﻿namespace DataAccess
+﻿namespace DomainLayer.Interfaces.RepositoryIntefraces
 {
     public interface IUserRepository<TObject> : IRepository<TObject>
     {
-        Orders GetUserOrders(TObject user);
+        IEnumerable<Orders> GetUserOrders(TObject user);
         Users? RetrieveUserCredentials(string phoneNumber);
     }
 }

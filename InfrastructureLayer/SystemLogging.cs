@@ -1,10 +1,8 @@
-﻿using System;
-using System.Data;
-using Microsoft.Data.SqlClient;
+﻿using System.Data;
 using Dapper;
-using DataAccess.Interfaces;
+using DomainLayer.Interfaces;
 
-namespace DataAccess
+namespace InfrastructureLayer
 {
     public  class DataBaseSystemTrackingLogger : ISystemTrackingLogger
     {

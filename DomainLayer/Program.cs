@@ -1,6 +1,11 @@
-using DataAccess;
-using DataAccess.Interfaces;
-using DomainLayer.middlewares;
+using ApplicationLayer;
+using DomainLayer;
+using DomainLayer.Interfaces;
+using DomainLayer.Interfaces.RepositoryIntefraces;
+using InfrastructureLayer;
+using InfrastructureLayer.Repositories;
+using Microsoft.AspNetCore.Identity;
+using PresentationLayer.middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +20,7 @@ builder.Services.AddSingleton<IConnection, DapperContext>();
 builder.Services.AddSingleton<ISystemTrackingLogger, DataBaseSystemTrackingLogger>();
 builder.Services.AddScoped<IUserRepository<Users>, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
-builder.Services.AddScoped<UsersLogin>();
+builder.Services.AddScoped<UserLogin>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
