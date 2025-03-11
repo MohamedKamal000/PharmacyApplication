@@ -1,4 +1,4 @@
-﻿namespace ApplicationLayer.Dtos
+﻿namespace ApplicationLayer.Dtos.User_DTOs
 {
     public class GetUserDto
     {

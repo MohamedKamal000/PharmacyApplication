@@ -1,5 +1,5 @@
 ﻿using ApplicationLayer;
-using ApplicationLayer.Dtos;
+using ApplicationLayer.Dtos.User_DTOs;
 using DomainLayer;
 using DomainLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;

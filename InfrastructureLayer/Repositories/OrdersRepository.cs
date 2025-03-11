@@ -1,5 +1,7 @@
-﻿using DomainLayer;
+﻿using Dapper;
+using DomainLayer;
 using DomainLayer.Interfaces;
+using DomainLayer.Interfaces.RepositoryIntefraces;
 
 namespace InfrastructureLayer.Repositories
 {
@@ -9,5 +11,27 @@ namespace InfrastructureLayer.Repositories
         {
         }
 
+
+        public override IEnumerable<Orders> GetAll()
+        {
+            IEnumerable<Orders> o = [];
+
+            string query = $"Select * From {DBSettings.Views.ShowAllOrders.ToString()}";
+
+            try
+            {
+                using (_dbConnection)
+                {
+                    o = _dbConnection.Query<Orders>(query);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"GetAll Orders Failed, error Message{e.Message}" +
+                                    $"Error Stack: {e.StackTrace}");
+            }
+
+            return o;
+        }
     }
 }

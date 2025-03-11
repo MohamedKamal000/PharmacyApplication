@@ -19,7 +19,7 @@
 
         public enum Views
         {
-            ShowAllOrdersDistinct
+            ShowAllOrders
         }
     }
 }

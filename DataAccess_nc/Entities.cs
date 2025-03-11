@@ -19,43 +19,69 @@
         }
     }
 
-    public class Orders
+    
+    public class UserOder
     {
-        public int Id { get; private set; } = -1;
         
-        public Users User { get; set; }
+        public Users User { get; set; } // one time
 
-        public List<MedicalProducts> Products { get; set; } = new List<MedicalProducts>();
+        public List<OrderedProducts> Products { get; set; } = new List<OrderedProducts>();// more than once
         
-        public int DeliveryManID { get; set; }
+        public int DeliveryManID { get; set; } // one time
         
-        public int Amount { get; set; }
+        public decimal DeliveryPrice { get; set; } // one time
         
-        public decimal DeliveryPrice { get; set; }
+        public decimal TotalPrice { get; set; } // one time
         
-        public decimal TotalPrice { get; set; }
+        public DateTime OrderDate { get; set; } // one time
         
-        public DateTime OrderDate { get; set; }
-        
-        public string Status { get; set; }
+        public string Status { get; set; } // one time
 
         public override string ToString()
         {
             // Convert the list of products to a string
-            string productsString = string.Join(", ", Products.Select(p => p.ToString()));
-
+            string prts = string.Join("\n\n", Products.Select(p => p.ToString())); ;
             // Build the final string representation
-            return $"Order ID: {Id}\n" +
+            return
                    $"User: {User?.ToString() ?? "No User"}\n" +
-                   $"Products: [{productsString}]\n" +
+                   $"Products: [{prts}]\n" +
                    $"DeliveryManID: {DeliveryManID}\n" +
-                   $"Amount: {Amount}\n" +
                    $"DeliveryPrice: {DeliveryPrice}\n" +
                    $"TotalPrice: {TotalPrice}\n" +
                    $"OrderDate: {OrderDate}\n" +
                    $"Status: {Status}";
         }
     }
+
+    public class Orders // this one used only to Retrieve all orders in db 
+    {
+        public string UserPhoneNumber { get; set; }
+
+        public string UserName { get; set; }
+
+        public string OrderStatus { get; set; }
+
+        public override string ToString()
+        {
+            return $"UserPhone: {UserPhoneNumber} \n" +
+                   $"UserName: {UserName} \n" +
+                   $"OrderStatus: {OrderStatus}";
+        }
+    }
+
+    public class OrderedProducts
+    {
+        public MedicalProducts Product { get; set; }
+
+        public int Amount { get; set; }
+
+        public override string ToString()
+        {
+            return $"Product: {Product.ToString()} \n" +
+                   $"Amount: {Amount}";
+        }
+    }
+
 
     public class MedicalProducts
     {

@@ -21,6 +21,7 @@ builder.Services.AddSingleton<ISystemTrackingLogger, DataBaseSystemTrackingLogge
 builder.Services.AddScoped<IUserRepository<Users>, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<UserLogin>();
+builder.Services.AddScoped<UserHandler>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

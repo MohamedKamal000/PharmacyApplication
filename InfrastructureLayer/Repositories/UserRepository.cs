@@ -16,52 +16,49 @@ namespace InfrastructureLayer.Repositories
             
         }
 
-        public IEnumerable<Orders> GetUserOrders(Users user)
+        public UserOder GetUserOrders(Users user)
         {
-            List<Orders> orders = new List<Orders>();
+            UserOder userOrder = null;
 
             try
             {
                 using (_dbConnection)
                 {
-                    var orderDictionary = new Dictionary<int, Orders>();
-
-                    orders = _dbConnection.Query<Orders, MedicalProducts, Users, Orders>(
+                    _dbConnection.Query<UserOder, MedicalProducts, OrderedProducts, Users, UserOder>(
                         DBSettings.ProceduresNames.GetUserOrders.ToString(),
-                        (order, product, userQ) =>
+                        (order, medicalProduct, finalOrderedProduct, userQ) =>
                         {
-                            if (!orderDictionary.TryGetValue(order.Id, out var orderEntry))
+                            if (userOrder == null)
                             {
-                                orderEntry = order;
-                                orderEntry.Products = new List<MedicalProducts>();
-                                orderEntry.User = userQ;
-                                orderDictionary.Add(orderEntry.Id, orderEntry);
+                                userOrder = order;
+                                userOrder.Products = new List<OrderedProducts>();
+                                userOrder.User = userQ;
                             }
 
-                            orderEntry.Products.Add(product);
-                            return orderEntry;
+                            finalOrderedProduct.Product = medicalProduct;
+                            userOrder.TotalPrice += finalOrderedProduct.Product.Price;
+                            userOrder.Products.Add(finalOrderedProduct);
+
+
+                            return userOrder;
                         },
                         new
                         {
                             UserPhoneNumber = user.PhoneNumber
                         },
-                        splitOn: "ProductName, PhoneNumber"
-                        , 
+                        splitOn: "ProductName, Amount, PhoneNumber", 
                         commandType: CommandType.StoredProcedure
-
-                    ).Distinct().ToList();
-
+                    );
                 }
             }
             catch (Exception e)
             {
-                throw new Exception($"GetUserOrders Failed, error Message{e.Message}" +
-                                    $"Error Stack: {e.StackTrace}");
+                throw new Exception($"GetUserOrders Failed, error Message: {e.Message}\nError Stack: {e.StackTrace}");
             }
 
-            return orders;
+            return userOrder;
         }
-        
+
         public  Users? RetrieveUserCredentials(string phoneNumber)
         {
             Users ? user = new Users();

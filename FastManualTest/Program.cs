@@ -23,13 +23,22 @@ namespace FastManualTest
                 PhoneNumber = "01000000000"
             };
 
-            List<Orders> o = T.GetUserOrders(u).ToList();
+            UserOder o = T.GetUserOrders(u);
 
-            foreach (var oo in o)
-            {
-                Console.WriteLine(oo.ToString());
-                Console.WriteLine("---------------------------------------");
-            }
+            Console.WriteLine(o.ToString());
+            
+
+            //IExtendedRepository<Orders> T = new OrdersRepository(
+
+            //    new DapperContext());
+
+            //List<Orders> TT = T.GetAll().ToList();
+
+
+            //foreach (var o in TT)
+            //{
+            //    Console.WriteLine(o.ToString());
+            //}
         }
     }
 }

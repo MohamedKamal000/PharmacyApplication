@@ -216,10 +216,10 @@ namespace InfrastructureLayer.Repositories
             return isOk;
         }
 
-        public IEnumerable<TObject>? GetAll()
+        public virtual IEnumerable<TObject> GetAll()
         {
             string table = typeof(TObject).Name;
-            IEnumerable<TObject>? result = null;
+            IEnumerable<TObject> result = [];
 
             try
             {
