@@ -5,16 +5,16 @@ using DomainLayer.Interfaces.RepositoryIntefraces;
 
 namespace InfrastructureLayer.Repositories
 {
-    public class OrdersRepository : GenericRepository<Orders>
+    public class OrdersRepository : GenericRepository<Order>
     {
         public OrdersRepository(IConnection dbConnection) : base(dbConnection)
         {
         }
 
 
-        public override IEnumerable<Orders> GetAll()
+        public override IEnumerable<Order> GetAll()
         {
-            IEnumerable<Orders> o = [];
+            IEnumerable<Order> o = [];
 
             string query = $"Select * From {DBSettings.Views.ShowAllOrders.ToString()}";
 
@@ -22,7 +22,7 @@ namespace InfrastructureLayer.Repositories
             {
                 using (_dbConnection)
                 {
-                    o = _dbConnection.Query<Orders>(query);
+                    o = _dbConnection.Query<Order>(query);
                 }
             }
             catch (Exception e)

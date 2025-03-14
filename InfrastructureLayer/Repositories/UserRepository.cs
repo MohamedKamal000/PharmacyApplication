@@ -16,45 +16,45 @@ namespace InfrastructureLayer.Repositories
             
         }
 
-        public UserOder GetUserOrders(Users user)
+        public Order GetUserOrders(Users user)
         {
-            UserOder userOrder = null;
+            Order userOrder = null;
 
-            try
-            {
-                using (_dbConnection)
-                {
-                    _dbConnection.Query<UserOder, MedicalProducts, OrderedProducts, Users, UserOder>(
-                        DBSettings.ProceduresNames.GetUserOrders.ToString(),
-                        (order, medicalProduct, finalOrderedProduct, userQ) =>
-                        {
-                            if (userOrder == null)
-                            {
-                                userOrder = order;
-                                userOrder.Products = new List<OrderedProducts>();
-                                userOrder.User = userQ;
-                            }
+            //try
+            //{
+            //    using (_dbConnection)
+            //    {
+            //        _dbConnection.Query<Order, Product, OrderedProducts, Users, Order>(
+            //            DBSettings.ProceduresNames.GetUserOrders.ToString(),
+            //            (order, medicalProduct, finalOrderedProduct, userQ) =>
+            //            {
+            //                if (userOrder == null)
+            //                {
+            //                    userOrder = order;
+            //                    userOrder.Products = new List<OrderedProducts>();
+            //                    userOrder.User = userQ;
+            //                }
 
-                            finalOrderedProduct.Product = medicalProduct;
-                            userOrder.TotalPrice += finalOrderedProduct.Product.Price;
-                            userOrder.Products.Add(finalOrderedProduct);
+            //                finalOrderedProduct.Product = medicalProduct;
+            //                userOrder.TotalPrice += finalOrderedProduct.Product.Price;
+            //                userOrder.Products.Add(finalOrderedProduct);
 
 
-                            return userOrder;
-                        },
-                        new
-                        {
-                            UserPhoneNumber = user.PhoneNumber
-                        },
-                        splitOn: "ProductName, Amount, PhoneNumber", 
-                        commandType: CommandType.StoredProcedure
-                    );
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"GetUserOrders Failed, error Message: {e.Message}\nError Stack: {e.StackTrace}");
-            }
+            //                return userOrder;
+            //            },
+            //            new
+            //            {
+            //                UserPhoneNumber = user.PhoneNumber
+            //            },
+            //            splitOn: "ProductName, Amount, PhoneNumber", 
+            //            commandType: CommandType.StoredProcedure
+            //        );
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new Exception($"GetUserOrders Failed, error Message: {e.Message}\nError Stack: {e.StackTrace}");
+            //}
 
             return userOrder;
         }

@@ -33,17 +33,7 @@ namespace ApplicationLayer
 
             userOrderDto = new UserOrderDto()
             {
-                User = new GetUserDto()
-                {
-                    UserName = userOrder.User.UserName,
-                    Id = userOrder.User.Id, PhoneNumber = userOrder.User.PhoneNumber
-                },
-                Products = userOrder.Products,
-                DeliveryManID = userOrder.DeliveryManID,
-                DeliveryPrice = userOrder.DeliveryPrice,
-                OrderDate = userOrder.OrderDate,
-                Status = userOrder.Status,
-                TotalPrice = userOrder.TotalPrice
+                
             };
 
             return true;

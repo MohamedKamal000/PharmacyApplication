@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "SqlConnection": "Server=.;Database=PharmacyApplication;User Id=sa;Password=sa123456;Encrypt=false;TrustServerCertificate=true"
+  }
+}

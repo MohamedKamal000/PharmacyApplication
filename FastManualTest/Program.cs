@@ -1,11 +1,7 @@
-﻿
-
-
-
-using DomainLayer;
-using DomainLayer.Interfaces.RepositoryIntefraces;
+﻿using DomainLayer;
 using InfrastructureLayer;
-using InfrastructureLayer.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace FastManualTest
 {
@@ -13,32 +9,30 @@ namespace FastManualTest
     {
         static void Main(string[] args)
         {
-
-            IUserRepository<Users> T = new UserRepository(
-                new DapperContext()
-            );
-
-            Users u = new Users()
+            using (ApplicationDbContext t = new ApplicationDbContext())
             {
-                PhoneNumber = "01000000000"
-            };
+                var users = t.Users.
+                    Include(u => u.Orders)
+                    .ThenInclude(o => o.Product)
+                    .Include(u => u.Orders)
+                    .ThenInclude(o => o.DeliveryMan)
+                    .Include(u => u.Orders)
+                    .ThenInclude(o => o.OrderStatus)
+                    .ToList();
 
-            UserOder o = T.GetUserOrders(u);
+                foreach (var U in users)
+                {
+                    Console.WriteLine(U.ToString());
+                    foreach (var o in U.Orders)
+                    {
+                        Console.WriteLine("User Orders Below ---");
+                        Console.WriteLine(o.ToString());
+                    }
+                }
+            } 
 
-            Console.WriteLine(o.ToString());
-            
 
-            //IExtendedRepository<Orders> T = new OrdersRepository(
-
-            //    new DapperContext());
-
-            //List<Orders> TT = T.GetAll().ToList();
-
-
-            //foreach (var o in TT)
-            //{
-            //    Console.WriteLine(o.ToString());
-            //}
+            Console.WriteLine("finished");
         }
     }
 }

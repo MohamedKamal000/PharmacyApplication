@@ -2,7 +2,7 @@
 {
     public interface IUserRepository<TObject> : IRepository<TObject>
     {
-        UserOder GetUserOrders(TObject user);
+        Order GetUserOrders(TObject user);
         Users? RetrieveUserCredentials(string phoneNumber);
     }
 }

@@ -6,7 +6,7 @@ namespace ApplicationLayer.Dtos.User_DTOs
     {
         public GetUserDto User { get; set; } // one time
 
-        public List<OrderedProducts> Products { get; set; } = new List<OrderedProducts>();// more than once
+        public List<Product> Products { get; set; } = new List<Product>();// more than once
 
         public int DeliveryManID { get; set; } // one time
 
