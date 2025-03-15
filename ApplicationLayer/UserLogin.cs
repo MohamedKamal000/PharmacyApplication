@@ -17,10 +17,10 @@ namespace ApplicationLayer
     
     public class UserLogin
     {
-        private readonly IUserRepository<Users> _usersGenericRepository;
+        private readonly IUserRepository<Users?> _usersGenericRepository;
         private readonly IPasswordHasher _passwordHasher;
         
-        public UserLogin(IUserRepository<Users> usersGenericRepository,IPasswordHasher passwordHasher)
+        public UserLogin(IUserRepository<Users?> usersGenericRepository,IPasswordHasher passwordHasher)
         {
             _usersGenericRepository = usersGenericRepository;
             _passwordHasher = passwordHasher;

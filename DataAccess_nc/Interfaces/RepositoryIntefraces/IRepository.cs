@@ -2,11 +2,11 @@
 {
     public interface IRepository<TObject>
     {
-        int Add(TObject obj);
-        int Update(KeyValuePair<string, object> whereClause, TObject obj);
-        int Delete(KeyValuePair<string, object> whereClause);
-        bool Get(KeyValuePair<string, object> whereClause, out IEnumerable<TObject> result);
+        int Add(TObject? obj);
+        int Update(TObject obj);
+        int Delete(TObject obj);
+        TObject? GetById(int id);
 
-        bool CheckExist(KeyValuePair<string, object> whereClause);
+        bool CheckExist(int id);
     }
 }
