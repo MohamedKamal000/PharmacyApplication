@@ -2,7 +2,11 @@
 {
     public interface IUserRepository<TObject> : IRepository<TObject>
     {
-        Order GetUserOrders(TObject user);
+        ICollection<Order> GetUserOrders(TObject user);
         Users? RetrieveUserCredentials(string phoneNumber);
+
+        int AddOrders(List<Order> orders);
+
+        bool CheckUserExistByPhone(string phoneNumber);
     }
 }

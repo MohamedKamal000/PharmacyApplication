@@ -1,8 +1,5 @@
 ﻿using System.Collections.Specialized;
-using System.Data;
-using Dapper;
 using DomainLayer;
-using DomainLayer.Interfaces;
 using DomainLayer.Interfaces.RepositoryIntefraces;
 
 namespace InfrastructureLayer.Repositories
@@ -10,72 +7,51 @@ namespace InfrastructureLayer.Repositories
     public class UserRepository : GenericRepository<Users>, IUserRepository<Users>
     {
         
-        public UserRepository(IConnection connection) 
+        public UserRepository(ApplicationDbContext connection) 
             : base(connection)
         {
             
         }
 
-        public Order GetUserOrders(Users user)
+        public ICollection<Order> GetUserOrders(Users user)
         {
-            Order userOrder = null;
+            List<Order> userOrder = new List<Order>();
 
-            //try
-            //{
-            //    using (_dbConnection)
-            //    {
-            //        _dbConnection.Query<Order, Product, OrderedProducts, Users, Order>(
-            //            DBSettings.ProceduresNames.GetUserOrders.ToString(),
-            //            (order, medicalProduct, finalOrderedProduct, userQ) =>
-            //            {
-            //                if (userOrder == null)
-            //                {
-            //                    userOrder = order;
-            //                    userOrder.Products = new List<OrderedProducts>();
-            //                    userOrder.User = userQ;
-            //                }
+            try
+            {
+                using (_dbContext)
+                {
+                    _dbContext.Entry(user).Collection(u => u.Orders).Load();
 
-            //                finalOrderedProduct.Product = medicalProduct;
-            //                userOrder.TotalPrice += finalOrderedProduct.Product.Price;
-            //                userOrder.Products.Add(finalOrderedProduct);
+                    foreach (var o in user.Orders)
+                    {
+                        _dbContext.Entry(o).Reference(o => o.Product);
+                        _dbContext.Entry(o).Reference(o => o.DeliveryMan);
+                        _dbContext.Entry(o).Reference(o => o.OrderStatus);
+                        _dbContext.Entry(o).Reference(o => o.User);
+                        o.User.Password = "";
+                    }
+                }
 
+                userOrder = user.Orders.ToList();
+            }
 
-            //                return userOrder;
-            //            },
-            //            new
-            //            {
-            //                UserPhoneNumber = user.PhoneNumber
-            //            },
-            //            splitOn: "ProductName, Amount, PhoneNumber", 
-            //            commandType: CommandType.StoredProcedure
-            //        );
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    throw new Exception($"GetUserOrders Failed, error Message: {e.Message}\nError Stack: {e.StackTrace}");
-            //}
+            catch (Exception e)
+            {
+                throw new Exception($"Couldn't get user Orders, Error Message: {e.Message}");
+            }
+
 
             return userOrder;
         }
 
         public  Users? RetrieveUserCredentials(string phoneNumber)
         {
-            Users ? user = new Users();
+            Users user;
+
             try
             {
-                using (_dbConnection)
-                {
-                    user = _dbConnection.Query<Users>(
-                        DBSettings.ProceduresNames.UserLogin.ToString(),
-                        new
-                        {
-                            PhoneNumber = phoneNumber
-                        },
-                        commandType: CommandType.StoredProcedure
-                    ).SingleOrDefault();
-                }
-
+                user = _dbSet.FirstOrDefault(u => u.PhoneNumber == phoneNumber);
             }
             catch (Exception e)
             {
@@ -86,6 +62,45 @@ namespace InfrastructureLayer.Repositories
             return user;
         }
 
+        public int AddOrders(List<Order> orders)
+        {
+            int result = -1;
+            try
+            {
+                using (_dbContext)
+                {
+                    foreach (var o in orders)
+                    {
+                        _dbContext.Orders.Add(o);
+                    }
 
+                    result = _dbContext.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"AddOrders Failed, error Message{e.Message}" +
+                                    $"Error Stack: {e.StackTrace}");
+            }
+
+            return result;
+        }
+
+
+        public bool CheckUserExistByPhone(string phoneNumber)
+        {
+            bool found = false;
+            try
+            {
+                found = _dbSet.FirstOrDefault(u => u.PhoneNumber == phoneNumber) != null;
+            }
+            catch(Exception e)
+            {
+                throw new Exception($"CheckUserExistByPhone Failed, error Message{e.Message}" +
+                                    $"Error Stack: {e.StackTrace}");
+            }
+
+            return found;
+        }
     }
 }

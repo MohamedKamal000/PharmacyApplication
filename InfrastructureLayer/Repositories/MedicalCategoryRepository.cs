@@ -5,7 +5,7 @@ namespace InfrastructureLayer.Repositories
 {
     public class MedicalCategoryRepository : GenericRepository<MedicalCategory>
     {
-        public MedicalCategoryRepository(IConnection dbConnection) : base(dbConnection)
+        public MedicalCategoryRepository(ApplicationDbContext dbConnection) : base(dbConnection)
         {
         }
 

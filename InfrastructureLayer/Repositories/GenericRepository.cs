@@ -11,22 +11,15 @@ namespace InfrastructureLayer.Repositories
     public class GenericRepository<TObject> : 
         IExtendedRepository<TObject> where TObject : class
     {
-        // used only in Insertion
-        protected readonly IDbConnection _dbConnection;
 
         protected readonly ApplicationDbContext _dbContext;
 
         protected readonly DbSet<TObject?> _dbSet;
-        
-        public GenericRepository(IConnection dbConnection)
-        {
-            _dbConnection = dbConnection.CreateConnection();
-        }
 
-        public GenericRepository(ApplicationDbContext dbContext, DbSet<TObject?> set)
+        public GenericRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
-            _dbSet = set;
+            _dbSet = _dbContext.Set<TObject?>();
         }
         
         public int Add(TObject? rowInserted)

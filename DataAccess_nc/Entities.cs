@@ -42,8 +42,6 @@ namespace DomainLayer
         [Column("Amount")]
         public int ProductAmount { get; set; }
 
-        public decimal TotalPrice { get; set; }
-
         public decimal DeliveryPrice { get; set; } // one time
 
         public DateTime OrderDate { get; set; } // one time

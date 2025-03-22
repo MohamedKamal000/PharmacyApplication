@@ -8,7 +8,7 @@ namespace ApplicationLayer.Dtos.User_DTOs
 
         public List<Product> Products { get; set; } = new List<Product>();// more than once
 
-        public int DeliveryManID { get; set; } // one time
+        public int? DeliveryManID { get; set; } // one time
 
         public decimal DeliveryPrice { get; set; } // one time
 

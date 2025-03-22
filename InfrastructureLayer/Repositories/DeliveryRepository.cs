@@ -5,7 +5,7 @@ namespace InfrastructureLayer.Repositories
 {
     public class DeliveryRepository : GenericRepository<Delivery>
     {
-        public DeliveryRepository(IConnection dbConnection) 
+        public DeliveryRepository(ApplicationDbContext dbConnection) 
             : base(dbConnection)
         {
         }
