@@ -1,10 +1,5 @@
-﻿using System.Data;
-using System.Reflection;
-using Dapper;
-using DomainLayer.Interfaces;
-using DomainLayer.Interfaces.RepositoryIntefraces;
+﻿using DomainLayer.Interfaces.RepositoryIntefraces;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 
 namespace InfrastructureLayer.Repositories
 {
@@ -33,12 +28,11 @@ namespace InfrastructureLayer.Repositories
             }
             catch (Exception e)
             {
-                throw new Exception($"Insertion Failed, error Message{e.Message}" +
-                                   $"Error Stack: {e.StackTrace}");
+                throw new Exception($"Failed to call function Add, Error {e.Message}, ErrorStack: {e.StackTrace}");
             }
-            
 
-            
+
+
             return resultID;
         }
         
@@ -52,8 +46,7 @@ namespace InfrastructureLayer.Repositories
             }
             catch (Exception e)
             {
-                throw new Exception($"Getting Element Failed, error Message{e.Message}" +
-                                    $"Error Stack: {e.StackTrace}");
+                throw new Exception($"Failed to call function GetById, Error {e.Message}, ErrorStack: {e.StackTrace}");
             }
 
 
@@ -71,8 +64,7 @@ namespace InfrastructureLayer.Repositories
             }
             catch (Exception e)
             {
-                throw new Exception($"Update Failed, error Message{e.Message}"
-                                    + $"Error Stack: {e.StackTrace}");
+                throw new Exception($"Failed to call function Update, Error {e.Message}, ErrorStack: {e.StackTrace}");
             }
 
             return result;
@@ -89,8 +81,7 @@ namespace InfrastructureLayer.Repositories
             }
             catch (Exception e)
             {
-                throw new Exception($"Deleting Failed, error Message{e.Message}"
-                                    + $"Error Stack: {e.StackTrace}");
+                throw new Exception($"Failed to call function Delete, Error {e.Message}, ErrorStack: {e.StackTrace}");
             }
 
             return result;

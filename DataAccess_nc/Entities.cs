@@ -71,7 +71,6 @@ namespace DomainLayer
                    $"DeliveryManID: {DeliveryManId}\n" +
                    $"DeliveryMan: {DeliveryMan?.ToString() ?? "No delivery Assigned"}\n" +
                    $"DeliveryPrice: {DeliveryPrice}\n" +
-                   $"TotalPrice: {TotalPrice}\n" +
                    $"OrderDate: {OrderDate}\n" +
                    $"Status: {OrderStatus?.Status ?? "No status"}";
         }

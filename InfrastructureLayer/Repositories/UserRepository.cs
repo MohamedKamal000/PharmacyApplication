@@ -13,6 +13,9 @@ namespace InfrastructureLayer.Repositories
             
         }
 
+
+        // must get the user first from db and send it to this function
+        // idk if this will be only for admins or both admins and users 
         public ICollection<Order> GetUserOrders(Users user)
         {
             List<Order> userOrder = new List<Order>();
@@ -25,11 +28,10 @@ namespace InfrastructureLayer.Repositories
 
                     foreach (var o in user.Orders)
                     {
-                        _dbContext.Entry(o).Reference(o => o.Product);
-                        _dbContext.Entry(o).Reference(o => o.DeliveryMan);
-                        _dbContext.Entry(o).Reference(o => o.OrderStatus);
-                        _dbContext.Entry(o).Reference(o => o.User);
-                        o.User.Password = "";
+                        _dbContext.Entry(o).Reference(or => or.Product);
+                        _dbContext.Entry(o).Reference(or => or.DeliveryMan);
+                        _dbContext.Entry(o).Reference(or => or.OrderStatus);
+                        o.User = user;
                     }
                 }
 
