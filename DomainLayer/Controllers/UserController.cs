@@ -5,6 +5,7 @@ using DomainLayer.Interfaces.RepositoryIntefraces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ApplicationLayer.Dtos.User_DTOs;
+using ApplicationLayer.Dtos.Order_DTOs;
 
 namespace PresentationLayer.Controllers
 {
@@ -54,8 +55,8 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpGet]
-        [Route("GetUserOrder/{phoneNumber}")]
-        public ActionResult<UserOrderDto> GetUserOrder(
+        [Route("TryGetUserOrder/{phoneNumber}")]
+        public ActionResult<RetrieveUserOrderDto> GetUserOrder(
             [Required(ErrorMessage = "PhoneNumber is Required")]
             [StringLength(11, MinimumLength = 11, ErrorMessage = "Phone Number is not accepted")]
             string phoneNumber
@@ -64,7 +65,7 @@ namespace PresentationLayer.Controllers
             if (!ModelState.IsValid)
                 return BadRequest("phoneNumber is Invalid");
 
-            if (!_userHandler.GetUserOrder(phoneNumber, out UserOrderDto? u))
+            if (!_userHandler.TryGetUserOrder(phoneNumber, out RetrieveUserOrderDto? u))
             {
                 return NotFound("User Has No Orders");
             }

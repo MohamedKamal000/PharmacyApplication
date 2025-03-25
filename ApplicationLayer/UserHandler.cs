@@ -1,4 +1,5 @@
-﻿using ApplicationLayer.Dtos.User_DTOs;
+﻿using ApplicationLayer.Dtos.Order_DTOs;
+using ApplicationLayer.Dtos.User_DTOs;
 using DomainLayer;
 using DomainLayer.Interfaces.RepositoryIntefraces;
 
@@ -15,32 +16,27 @@ namespace ApplicationLayer
         }
 
 
-        public Users? GetUser(string phoneNumber)
+        public GetUserDto? GetUser(string phoneNumber)
         {
-            Users? user = _userRepository.RetrieveUserCredentials(phoneNumber);
+            Users? user = _userRepository.RetrieveUser(phoneNumber);
 
-            return user;
+
+            return new GetUserDto(){PhoneNumber = user.PhoneNumber, UserName = user.UserName, Id = user.Id};
         }
 
 
-        public bool GetUserOrder(string phoneNumber,out UserOrderDto? userOrderDto)
+        public bool TryGetUserOrder(string phoneNumber,out RetrieveUserOrderDto? userOrderDto)
         {
             userOrderDto = null;
             if (!_userRepository.CheckUserExistByPhone(phoneNumber)) return false;
 
-            var userOrder = _userRepository.GetUserOrders(new Users() { PhoneNumber = phoneNumber }).ToList();
+            Users user = _userRepository.RetrieveUser(phoneNumber)!;
+            var userOrder = _userRepository.GetUserOrders(user).ToList();
 
 
 
-            userOrderDto = new UserOrderDto()
+            userOrderDto = new RetrieveUserOrderDto()
             {
-                User = new GetUserDto()
-                {
-                    Id = userOrder.ElementAt(0).User.Id,
-                    PhoneNumber = phoneNumber,
-                    UserName = userOrder.ElementAt(0).User.UserName
-                },
-
                 DeliveryManID = userOrder.ElementAt(0).DeliveryManId,
                 DeliveryPrice = userOrder.ElementAt(0).DeliveryPrice,
                 OrderDate = userOrder.ElementAt(0).OrderDate,
@@ -57,6 +53,32 @@ namespace ApplicationLayer
 
 
             return true;
+        }
+
+
+        public bool TryAddNewOrders(string phoneNumber,List<AddOrderDto> retrieveUserOrder)
+        {
+            if (!_userRepository.CheckUserExistByPhone(phoneNumber)) return false;
+
+            Users user = _userRepository.RetrieveUser(phoneNumber)!;
+            List<Order> orders = new List<Order>();
+            Order baseOrderInformation = new Order()
+            {
+                User = user,
+                OrderDate = DateTime.Now,
+                DeliveryPrice = 50,
+            };  
+                
+            foreach (var order in retrieveUserOrder)
+            {
+                Order newOrder = baseOrderInformation;
+
+                newOrder.Product = order.Product;
+                newOrder.ProductAmount = order.Amount;
+                orders.Add(newOrder);
+            }
+
+            return _userRepository.AddOrders(orders) != -1;
         }
 
     }

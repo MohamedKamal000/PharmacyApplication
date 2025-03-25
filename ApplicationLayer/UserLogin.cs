@@ -31,7 +31,7 @@ namespace ApplicationLayer
             bool isOk = false;
             userRole = null;
             
-            Users? user = _usersGenericRepository.RetrieveUserCredentials(userLoginDto.PhoneNumber);
+            Users? user = _usersGenericRepository.RetrieveUser(userLoginDto.PhoneNumber);
             if (user != null && _passwordHasher.Verify(userLoginDto.Password, user.Password))
             {
                 userRole = user.Role
@@ -58,7 +58,7 @@ namespace ApplicationLayer
         {
             bool isOk = false;
 
-            Users? user = _usersGenericRepository.RetrieveUserCredentials(userSession.IdentifyUser());
+            Users? user = _usersGenericRepository.RetrieveUser(userSession.IdentifyUser());
 
             if (user == null) return isOk;
             
@@ -83,7 +83,7 @@ namespace ApplicationLayer
         {
             bool isOk = false;
 
-            Users ? user = _usersGenericRepository.RetrieveUserCredentials(userSession.IdentifyUser());
+            Users ? user = _usersGenericRepository.RetrieveUser(userSession.IdentifyUser());
 
             if (user == null) return isOk;
             

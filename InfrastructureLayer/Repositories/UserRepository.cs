@@ -31,7 +31,6 @@ namespace InfrastructureLayer.Repositories
                         _dbContext.Entry(o).Reference(or => or.Product);
                         _dbContext.Entry(o).Reference(or => or.DeliveryMan);
                         _dbContext.Entry(o).Reference(or => or.OrderStatus);
-                        o.User = user;
                     }
                 }
 
@@ -47,7 +46,7 @@ namespace InfrastructureLayer.Repositories
             return userOrder;
         }
 
-        public  Users? RetrieveUserCredentials(string phoneNumber)
+        public  Users? RetrieveUser(string phoneNumber)
         {
             Users user;
 
