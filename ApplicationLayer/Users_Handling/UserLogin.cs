@@ -3,7 +3,7 @@ using DomainLayer;
 using DomainLayer.Interfaces;
 using DomainLayer.Interfaces.RepositoryIntefraces;
 
-namespace ApplicationLayer
+namespace ApplicationLayer.Users_Handling
 {
     // should consider adding any of the following features later on 
     

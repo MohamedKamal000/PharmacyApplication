@@ -6,8 +6,7 @@ namespace ApplicationLayer.Dtos.Order_DTOs
 {
     public class AddOrderDto
     {
-        [Required]
-        public Product Product { get; set; } = new Product();
+        [Required] public string ProductName { get; set; } = null!;
 
         [Required]
         public int Amount { get; set; }

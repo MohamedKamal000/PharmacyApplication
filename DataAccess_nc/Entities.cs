@@ -99,6 +99,11 @@ namespace DomainLayer
             return $"Product ID: {Id}, Name: {ProductName}, Price: {Price}, Stock: {Stock}, Description: {ItemDescription}, Category: {ProductCategory}, SubCategory: {ProductSubCategory}";
         }
 
+        public bool IsProductAvailable()
+        {
+            return Stock > 0;
+        }
+
         [ForeignKey(nameof(ProductCategory))] 
         public MedicalCategory MedicalCategory { get; set; } = null!;
 

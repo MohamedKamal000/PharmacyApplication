@@ -1,6 +1,4 @@
-﻿using Dapper;
-using DomainLayer;
-using DomainLayer.Interfaces;
+﻿using DomainLayer;
 using DomainLayer.Interfaces.RepositoryIntefraces;
 using Microsoft.EntityFrameworkCore;
 
@@ -78,6 +76,8 @@ namespace InfrastructureLayer.Repositories
                     {
                         o.StatusId = (int) OrderStatusEnum.delivering;
                         o.DeliveryMan = deliveryMan;
+                        _dbSet.Attach(o);
+                        _dbSet.Entry(o).State = EntityState.Modified;
                     }
 
                     result = _dbContext.SaveChanges();
@@ -99,13 +99,15 @@ namespace InfrastructureLayer.Repositories
             {
                 using (_dbContext)
                 {
-                    List<Order> orders = _dbContext.Orders.Include(o => o.User)
+                    List<Order> orders = _dbSet.Include(o => o.User)
                         .Where(o => o.User.PhoneNumber == user.PhoneNumber).ToList();
 
 
                     foreach (var o in orders)
                     {
                         o.StatusId = (int) OrderStatusEnum.declined;
+                        _dbSet.Attach(o);
+                        _dbSet.Entry(o).State = EntityState.Modified;
                     }
 
                     result = _dbContext.SaveChanges();
@@ -128,12 +130,16 @@ namespace InfrastructureLayer.Repositories
                 using (_dbContext)
                 {
                     List<Order> orders = _dbContext.Orders.Include(o => o.User)
-                        .Where(o => o.User.PhoneNumber == user.PhoneNumber).ToList();
+                        .Where(o => o.User.PhoneNumber == user.PhoneNumber)
+                        .Include(o => o.Product).ToList();
 
 
                     foreach (var o in orders)
                     {
-                        o.StatusId = (int)OrderStatusEnum.delivered;
+                        o.StatusId = (int) OrderStatusEnum.delivered;
+                        o.Product.Stock -= o.ProductAmount;
+                        _dbSet.Attach(o);
+                        _dbSet.Entry(o).State = EntityState.Modified;
                     }
 
                     result = _dbContext.SaveChanges();

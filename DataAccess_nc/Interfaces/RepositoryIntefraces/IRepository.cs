@@ -7,6 +7,8 @@
         int Delete(TObject obj);
         TObject? GetById(int id);
 
+        IEnumerable<TObject> GetAll();
+
         bool CheckExist(int id);
     }
 }

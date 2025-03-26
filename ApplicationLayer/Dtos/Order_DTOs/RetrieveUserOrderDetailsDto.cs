@@ -2,7 +2,7 @@
 
 namespace ApplicationLayer.Dtos.Order_DTOs
 {
-    public class RetrieveUserOrderDto
+    public class RetrieveUserOrderDetailsDto
     {
         public List<Product> Products { get; set; } = new List<Product>();// more than once
 

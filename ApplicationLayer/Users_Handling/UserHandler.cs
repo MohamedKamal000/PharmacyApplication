@@ -3,16 +3,18 @@ using ApplicationLayer.Dtos.User_DTOs;
 using DomainLayer;
 using DomainLayer.Interfaces.RepositoryIntefraces;
 
-namespace ApplicationLayer
+namespace ApplicationLayer.Users_Handling
 {
     public class UserHandler
     {
 
         private readonly IUserRepository<Users> _userRepository;
+        private readonly IProductRepository _productRepository;
 
-        public UserHandler(IUserRepository<Users> userRepository)
+        public UserHandler(IUserRepository<Users> userRepository,IProductRepository productRepository)
         {
             _userRepository = userRepository;
+            _productRepository = productRepository;
         }
 
 
@@ -25,7 +27,7 @@ namespace ApplicationLayer
         }
 
 
-        public bool TryGetUserOrder(string phoneNumber,out RetrieveUserOrderDto? userOrderDto)
+        public bool TryGetUserOrder(string phoneNumber,out RetrieveUserOrderDetailsDto? userOrderDto)
         {
             userOrderDto = null;
             if (!_userRepository.CheckUserExistByPhone(phoneNumber)) return false;
@@ -35,7 +37,7 @@ namespace ApplicationLayer
 
 
 
-            userOrderDto = new RetrieveUserOrderDto()
+            userOrderDto = new RetrieveUserOrderDetailsDto()
             {
                 DeliveryManID = userOrder.ElementAt(0).DeliveryManId,
                 DeliveryPrice = userOrder.ElementAt(0).DeliveryPrice,
@@ -71,9 +73,10 @@ namespace ApplicationLayer
                 
             foreach (var order in retrieveUserOrder)
             {
-                Order newOrder = baseOrderInformation;
+                if (!CanUserOrderThis(order.ProductName,order.Amount)) return false;
 
-                newOrder.Product = order.Product;
+                Order newOrder = baseOrderInformation;
+                newOrder.Product = _productRepository.GetProductByName(order.ProductName)!;
                 newOrder.ProductAmount = order.Amount;
                 orders.Add(newOrder);
             }
@@ -81,5 +84,14 @@ namespace ApplicationLayer
             return _userRepository.AddOrders(orders) != -1;
         }
 
+
+        private bool CanUserOrderThis(string productName,int amount)
+        {
+            Product? product = _productRepository.GetProductByName(productName);
+            if (product == null) return false;
+
+
+            return product.Stock >= amount;
+        }
     }
 }

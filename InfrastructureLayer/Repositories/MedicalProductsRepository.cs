@@ -1,5 +1,4 @@
 ﻿using DomainLayer;
-using DomainLayer.Interfaces;
 using DomainLayer.Interfaces.RepositoryIntefraces;
 
 namespace InfrastructureLayer.Repositories
@@ -14,7 +13,7 @@ namespace InfrastructureLayer.Repositories
 
         public ICollection<Product> GetAllProductsWithMedicalCategory(MedicalCategory medicalCategory)
         {
-            ICollection<Product> products = null;
+            ICollection<Product> products = new List<Product>();
 
             try
             {
@@ -34,7 +33,7 @@ namespace InfrastructureLayer.Repositories
 
         public ICollection<Product> GetAllProductsWithSubMedicalCategory(SubMedicalCategory subMedicalCategory)
         {
-            ICollection<Product> products = null;
+            ICollection<Product> products = new List<Product>();
 
             try
             {
