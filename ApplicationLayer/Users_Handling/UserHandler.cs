@@ -93,5 +93,7 @@ namespace ApplicationLayer.Users_Handling
 
             return product.Stock >= amount;
         }
+
+        
     }
 }

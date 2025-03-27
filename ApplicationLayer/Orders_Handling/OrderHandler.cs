@@ -1,4 +1,5 @@
 ﻿
+using ApplicationLayer.Dtos.Delivery_DTOs;
 using ApplicationLayer.Dtos.Order_DTOs;
 using ApplicationLayer.Dtos.User_DTOs;
 using DomainLayer;
@@ -11,14 +12,16 @@ namespace ApplicationLayer.Orders_Handling
 
         private readonly IOrdersRepository _ordersRepository;
         private readonly IUserRepository<Users> _userRepository;
+        private readonly IDeliveryRepository _deliveryRepository;
+         
 
-        // delete order required 
-
-        public OrderHandler(IOrdersRepository ordersRepository, IUserRepository<Users> userRepository)
+        public OrderHandler(IOrdersRepository ordersRepository, IUserRepository<Users> userRepository, 
+            IDeliveryRepository deliveryRepository)
         {
 
             _ordersRepository = ordersRepository;
             _userRepository = userRepository;
+            _deliveryRepository = deliveryRepository;
         }
 
 
@@ -73,11 +76,11 @@ namespace ApplicationLayer.Orders_Handling
         }
 
 
-        public bool TryAcceptOrder(GetUserDto userDto, Delivery deliveryMan)
+        public bool TryAcceptOrder(GetUserDto userDto, DeliveryDto delivery)
         {
             Users ? user = _userRepository.RetrieveUser(userDto.PhoneNumber);
-            // should retrive delivery man here as well
-            if (user == null) return false;
+            Delivery? deliveryMan = _deliveryRepository.SearchDeliveryManByPhone(delivery.PhoneNumber);
+            if (user == null || deliveryMan == null) return false;
 
 
             return _ordersRepository.AcceptUserOrders(user, deliveryMan) != -1;
@@ -105,5 +108,13 @@ namespace ApplicationLayer.Orders_Handling
 
         }
 
+
+        public bool TryDeleteOrder(int orderId)
+        {
+            Order? order = _ordersRepository.GetById(orderId);
+            if (order == null) return false;
+
+            return _ordersRepository.Delete(order) != -1;
+        }
     }
 }

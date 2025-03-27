@@ -27,5 +27,23 @@ namespace InfrastructureLayer.Repositories
 
             return result;
         }
+
+        public ICollection<SubMedicalCategory> GetSubCategories(MedicalCategory medicalCategory)
+        {
+            ICollection<SubMedicalCategory> result = new List<SubMedicalCategory>();
+
+            try
+            {
+                _dbSet.Entry(medicalCategory).Collection(m => m.SubMedicalCategories).Load();
+                result = medicalCategory.SubMedicalCategories.ToList();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(
+                    $"Failed to call function GetSubCategories, Error {e.Message}, ErrorStack: {e.StackTrace}");
+            }
+
+            return result;
+        }
     }
 }

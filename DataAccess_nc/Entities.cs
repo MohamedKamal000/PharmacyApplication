@@ -131,7 +131,7 @@ namespace DomainLayer
     [Table("MedicalCategory")]
     public class MedicalCategory
     {
-        public int Id { get; private set; } = -1;
+        public int Id { get; set; }
 
         public string CategoryName { get; set; }
 
@@ -141,14 +141,15 @@ namespace DomainLayer
     [Table("SubMedicalCategory")]
     public class SubMedicalCategory
     {
-        public int Id { get; private set; } = -1;
-        
-        public int MainCategory { get; set; }
+        public int Id { get; set; }
 
-        public string SubMedicalCategoryName { get; set; }
+        [Column("MainCategory")]
+        public int MainCategoryId { get; set; }
+
+        public string SubMedicalCategoryName { get; set; } = null!;
 
 
-        [ForeignKey(nameof(MedicalCategory))]
+        [ForeignKey(nameof(MainCategoryId))]
         public MedicalCategory MainMedicalCategory { get; set; }
     }
 
