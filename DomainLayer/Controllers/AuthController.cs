@@ -3,6 +3,7 @@ using ApplicationLayer.Users_Handling;
 using DomainLayer;
 using DomainLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using PresentationLayer.Utilities;
 
 namespace PresentationLayer.Controllers
 {
@@ -23,32 +24,17 @@ namespace PresentationLayer.Controllers
         public ActionResult<int> RegisterNewUser(RegisterUserDto user_dto)
         {
             if (!ModelState.IsValid) return BadRequest();
-            if (_usersLogin.CheckUserExist(user_dto.PhoneNumber)) return BadRequest("User Already Exist");
 
-
-            Users user = new Users()
-            {
-                PhoneNumber = user_dto.PhoneNumber,
-                Password = user_dto.Password,
-                UserName = user_dto.UserName,
-                Role = false
-            };
-
-
-            int resultID = _usersLogin.RegisterNewUser(user);
+            int resultID = _usersLogin.RegisterNewUser(user_dto);
 
             if (resultID != -1)
             {
                 return Ok(resultID);
             }
 
-            ProblemDetails problem = new ProblemDetails()
-            {
-                Status = StatusCodes.Status400BadRequest,
-                Title = "Input Error",
-                Type = "Input Error",
-                Detail = "Phone Number is Invalid"
-            };
+            ProblemDetails problem =
+                ProblemDetailsManipulator.CreateProblemDetailWithBadRequest("Phone Number is Invalid");
+            
 
             return BadRequest(problem);
         }

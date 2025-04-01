@@ -44,13 +44,21 @@ namespace ApplicationLayer.Users_Handling
             return isOk;
         }
 
-        public  int RegisterNewUser(Users user)
+        public  int RegisterNewUser(RegisterUserDto userDto)
         {
-            if (!user.PhoneNumber.All(char.IsDigit)) return -1;
-            if (_usersGenericRepository.CheckUserExistByPhone(user.PhoneNumber)) return -1;
+            if (!userDto.PhoneNumber.All(char.IsDigit)) return -1;
+            if (_usersGenericRepository.CheckUserExistByPhone(userDto.PhoneNumber)) return -1;
 
 
-            user.Password = _passwordHasher.Hash(user.Password);
+            Users user = new Users()
+            {
+                PhoneNumber = userDto.PhoneNumber,
+                Password = userDto.Password,
+                UserName = userDto.UserName,
+                Role = false
+            };
+
+            user.Password = _passwordHasher.Hash(userDto.Password);
             return _usersGenericRepository.Add(user);
         }
         

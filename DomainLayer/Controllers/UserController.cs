@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using ApplicationLayer.Dtos.User_DTOs;
 using ApplicationLayer.Dtos.Order_DTOs;
 using ApplicationLayer.Users_Handling;
+using PresentationLayer.Utilities;
 
 namespace PresentationLayer.Controllers
 {
@@ -23,35 +24,28 @@ namespace PresentationLayer.Controllers
 
         [HttpGet]
         [Route("{phoneNumber}")]
-        public ActionResult<GetUserDto> GetUser
-        (
+        public ActionResult<GetUserDto> GetUser(
             [Required(ErrorMessage = "PhoneNumber is Required")]
             [StringLength(11, MinimumLength = 11, ErrorMessage = "Phone Number is not accepted")]
-            string phoneNumber
-        )
-        
+            string phoneNumber)
         {
             if (!ModelState.IsValid)
                 return BadRequest("phoneNumber is Invalid");
 
-            Users? user = _userHandler.GetUser(phoneNumber);
+            GetUserDto? user = _userHandler.GetUser(phoneNumber);
 
 
             if (user == null)
             {
-                return BadRequest();
+
+                ProblemDetails problem =
+                    ProblemDetailsManipulator.CreateProblemDetailWithBadRequest("Phone Number is Invalid");
+                return BadRequest(problem);
             }
 
-            GetUserDto user_dto = new GetUserDto()
-            {
-                Id = user.Id,
-                PhoneNumber = user.PhoneNumber,
-                UserName = user.UserName,
-            };
 
 
-
-            return Ok(user_dto);
+            return Ok(user);
         }
 
         [HttpGet]
@@ -59,8 +53,7 @@ namespace PresentationLayer.Controllers
         public ActionResult<RetrieveUserOrderDetailsDto> GetUserOrder(
             [Required(ErrorMessage = "PhoneNumber is Required")]
             [StringLength(11, MinimumLength = 11, ErrorMessage = "Phone Number is not accepted")]
-            string phoneNumber
-            )
+            string phoneNumber)
         {
             if (!ModelState.IsValid)
                 return BadRequest("phoneNumber is Invalid");
@@ -70,8 +63,33 @@ namespace PresentationLayer.Controllers
                 return NotFound("User Has No Orders");
             }
 
-
             return u;
         }
+
+        [HttpPost]
+        [Route("AddUserOrder/{phoneNumber}")]
+        public ActionResult<int> AddUserOrder(
+            [Required(ErrorMessage = "PhoneNumber is Required")]
+            [StringLength(11, MinimumLength = 11, ErrorMessage = "Phone Number is not accepted")]
+            string phoneNumber,
+            List<AddOrderDto> orders)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid Input");
+
+            if (!_userHandler.TryAddNewOrders(phoneNumber, orders))
+            {
+                ProblemDetails problem = ProblemDetailsManipulator
+                    .CreateProblemDetailWithBadRequest("Invalid Order details");
+                return BadRequest(problem);
+            }
+
+
+            return Ok();
+        }
+
+
+
+        
     }
 }

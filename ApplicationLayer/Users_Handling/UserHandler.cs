@@ -83,7 +83,7 @@ namespace ApplicationLayer.Users_Handling
 
             return _userRepository.AddOrders(orders) != -1;
         }
-
+        
 
         private bool CanUserOrderThis(string productName,int amount)
         {

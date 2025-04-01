@@ -15,10 +15,15 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<ApplicationDbContext>();
 
-builder.Services.AddSingleton<IConnection, DapperContext>();
 builder.Services.AddSingleton<ISystemTrackingLogger, DataBaseSystemTrackingLogger>();
 builder.Services.AddScoped<IUserRepository<Users>, UserRepository>();
+builder.Services.AddScoped<IProductRepository, MedicalProductsRepository>();
+builder.Services.AddScoped<IDeliveryRepository,DeliveryRepository>();
+builder.Services.AddScoped<IMedicalCategory,MedicalCategoryRepository>();
+builder.Services.AddScoped<IOrdersRepository,OrdersRepository>();
+builder.Services.AddScoped<ISubMedicalCategory,SubMedicalCategoryRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<UserLogin>();
 builder.Services.AddScoped<UserHandler>();

@@ -12,7 +12,7 @@ namespace InfrastructureLayer
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("db_config.json").Build();
+                .AddJsonFile("appsettings.json").Build();
 
             var connectionString = configurationBuilder.GetConnectionString("SqlConnection");
 
