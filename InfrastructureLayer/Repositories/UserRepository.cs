@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using DomainLayer;
 using DomainLayer.Interfaces.RepositoryIntefraces;
+using Microsoft.EntityFrameworkCore;
 
 namespace InfrastructureLayer.Repositories
 {
@@ -28,9 +29,9 @@ namespace InfrastructureLayer.Repositories
 
                     foreach (var o in user.Orders)
                     {
-                        _dbContext.Entry(o).Reference(or => or.Product);
-                        _dbContext.Entry(o).Reference(or => or.DeliveryMan);
-                        _dbContext.Entry(o).Reference(or => or.OrderStatus);
+                        _dbContext.Entry(o).Reference(or => or.Product).Load();
+                        _dbContext.Entry(o).Reference(or => or.DeliveryMan).Load();
+                        _dbContext.Entry(o).Reference(or => or.OrderStatus).Load();
                     }
                 }
 
@@ -72,6 +73,8 @@ namespace InfrastructureLayer.Repositories
                 {
                     foreach (var o in orders)
                     {
+                        _dbContext.MedicalProducts.Attach(o.Product).Entity.Stock -= o.ProductAmount;
+                        _dbContext.MedicalProducts.Attach(o.Product).State = EntityState.Modified;
                         _dbContext.Orders.Add(o);
                     }
 

@@ -1,5 +1,6 @@
 ﻿using ApplicationLayer.Dtos.Order_DTOs;
 using ApplicationLayer.Dtos.User_DTOs;
+using Dapper;
 using DomainLayer;
 using DomainLayer.Interfaces.RepositoryIntefraces;
 
@@ -69,15 +70,34 @@ namespace ApplicationLayer.Users_Handling
                 User = user,
                 OrderDate = DateTime.Now,
                 DeliveryPrice = 50,
-            };  
-                
+                StatusId = (int) OrderStatusEnum.pending,
+                DeliveryManId = null
+            };
+
+            Dictionary<string, int> totalProductsAmount = new Dictionary<string, int>();
+
             foreach (var order in retrieveUserOrder)
             {
-                if (!CanUserOrderThis(order.ProductName,order.Amount)) return false;
+                if (!totalProductsAmount.ContainsKey(order.ProductName))
+                {
+                    totalProductsAmount.Add(order.ProductName, order.Amount);
+                }
+                else
+                {
+                    totalProductsAmount[order.ProductName] += order.Amount;
+                }
+            }
+
+            foreach (var order in totalProductsAmount)
+            {
+                if (!CanUserOrderThis(order.Key, order.Value)) return false;
 
                 Order newOrder = baseOrderInformation;
-                newOrder.Product = _productRepository.GetProductByName(order.ProductName)!;
-                newOrder.ProductAmount = order.Amount;
+                var orderProduct = _productRepository.GetProductByName(order.Key)!;
+                
+                            
+                newOrder.Product = orderProduct;
+                newOrder.ProductAmount = order.Value;
                 orders.Add(newOrder);
             }
 
