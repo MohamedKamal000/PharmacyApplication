@@ -1,4 +1,5 @@
 ﻿using ApplicationLayer.Dtos.Order_DTOs;
+using ApplicationLayer.Dtos.Product_DTOS;
 using ApplicationLayer.Dtos.User_DTOs;
 using Dapper;
 using DomainLayer;
@@ -37,7 +38,6 @@ namespace ApplicationLayer.Users_Handling
             var userOrder = _userRepository.GetUserOrders(user).ToList();
 
 
-
             userOrderDto = new RetrieveUserOrderDetailsDto()
             {
                 DeliveryManID = userOrder.ElementAt(0).DeliveryManId,
@@ -49,7 +49,17 @@ namespace ApplicationLayer.Users_Handling
 
             foreach (var o in userOrder)
             {
-                userOrderDto.Products.Add(o.Product);
+                RetrieveProductDto P = new RetrieveProductDto()
+                {
+                    Amount = o.ProductAmount,
+                    Id = o.ProductId,
+                    Price = o.Product.Price,
+                    ProductName = o.Product.ProductName,
+                    ProductCategory = o.Product.ProductCategory,
+                    ProductSubCategory = o.Product.ProductSubCategory,
+                    Stock = o.Product.Stock
+                };
+                userOrderDto.Products.Add(P);
                 userOrderDto.TotalPrice += o.Product.Price * o.ProductAmount;
             }
 

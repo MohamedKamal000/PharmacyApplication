@@ -4,7 +4,6 @@ using DomainLayer.Interfaces;
 using DomainLayer.Interfaces.RepositoryIntefraces;
 using InfrastructureLayer;
 using InfrastructureLayer.Repositories;
-using Microsoft.AspNetCore.Identity;
 using PresentationLayer.middlewares;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,10 +1,11 @@
-﻿using DomainLayer;
+﻿using ApplicationLayer.Dtos.Product_DTOS;
+using DomainLayer;
 
 namespace ApplicationLayer.Dtos.Order_DTOs
 {
     public class RetrieveUserOrderDetailsDto
     {
-        public List<Product> Products { get; set; } = new List<Product>();// more than once
+        public List<RetrieveProductDto> Products { get; set; } = new List<RetrieveProductDto>();// more than once
 
         public int? DeliveryManID { get; set; } // one time
 

@@ -404,7 +404,3 @@ Testing/Testing.csproj
 
 
 .idea
-Properties
-*.sln
-*.csproj
-*.config
