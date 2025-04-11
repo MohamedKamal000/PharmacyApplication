@@ -6,7 +6,7 @@ namespace PresentationLayer.middlewares
 {
     public class GlobalErrorHandlerMiddleWare
     {
-        private readonly RequestDelegate _next;
+        /*private readonly RequestDelegate _next;
         private readonly ISystemTrackingLogger _logger;
 
         public GlobalErrorHandlerMiddleWare(RequestDelegate next,ISystemTrackingLogger logger)
@@ -42,6 +42,6 @@ namespace PresentationLayer.middlewares
 
                 await context.Response.WriteAsync(error);
             }
-        }
+        }*/
     }
 }

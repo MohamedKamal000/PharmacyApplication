@@ -2,22 +2,22 @@
 
 using DomainLayer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace InfrastructureLayer
 {
     public class ApplicationDbContext : DbContext
     {
+        
+        private readonly string _connectionString;
+        public ApplicationDbContext(IOptions<DataBaseOptions> options)
+        {
+            _connectionString = options.Value.SqlConnection;
+        }
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json").Build();
-
-            var connectionString = configurationBuilder.GetConnectionString("SqlConnection");
-
-
-            optionsBuilder.UseSqlServer(connectionString);
+            optionsBuilder.UseSqlServer(_connectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -9,7 +9,7 @@ namespace FastManualTest
     {
         static void Main(string[] args)
         {
-            using (ApplicationDbContext t = new ApplicationDbContext())
+            /*using (ApplicationDbContext t = new ApplicationDbContext())
             {
                 var users = t.Users.
                     Include(u => u.Orders)
@@ -34,7 +34,7 @@ namespace FastManualTest
             } 
 
 
-            Console.WriteLine("finished");
+            Console.WriteLine("finished");*/
         }
     }
 }

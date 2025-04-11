@@ -3,11 +3,24 @@ using DomainLayer;
 using DomainLayer.Interfaces;
 using DomainLayer.Interfaces.RepositoryIntefraces;
 using InfrastructureLayer;
+using InfrastructureLayer.Logging;
 using InfrastructureLayer.Repositories;
 using PresentationLayer.middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddJsonFile("appsettings.json");
+builder.Services.Configure<DataBaseOptions>(builder.Configuration.GetSection("DataBaseOptions"));
+
+builder.Logging.ClearProviders();
+builder.Logging.AddProvider(new DataBaseLoggerProvider(
+    new DataBaseOptions()
+    {
+       SqlConnection = builder.Configuration["ConnectionStrings:SqlConnection"]!,
+       AdminBehaviour = builder.Configuration["DataBaseLogging:AdminBehaviour"]!,
+       SystemBehaviour = builder.Configuration["DataBaseLogging:SystemBehaviour"]!
+    }
+    ));
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -16,7 +29,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>();
 
-builder.Services.AddSingleton<ISystemTrackingLogger, DataBaseSystemTrackingLogger>();
+
 builder.Services.AddScoped<IUserRepository<Users>, UserRepository>();
 builder.Services.AddScoped<IProductRepository, MedicalProductsRepository>();
 builder.Services.AddScoped<IDeliveryRepository,DeliveryRepository>();
@@ -40,7 +53,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseMiddleware<RequestTimeMeasurementMiddleWare>();
-app.UseMiddleware<GlobalErrorHandlerMiddleWare>();
 
 app.MapControllers();
 
