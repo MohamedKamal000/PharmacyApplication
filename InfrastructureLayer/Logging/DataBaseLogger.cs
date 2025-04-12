@@ -8,14 +8,12 @@ namespace InfrastructureLayer.Logging
     {
         private readonly DataBaseOptions _dataBaseOptions;
         private readonly string _category;
-        private LogLevel _currentAcceptedLogLevel;
         private Dictionary<string, Action<string,string>> LogBehaviourType;
         
         public DataBaseLogger(DataBaseOptions dataBaseOptions,string category)
         {
             _category = category;
             _dataBaseOptions = dataBaseOptions;
-            _currentAcceptedLogLevel = LogLevel.Error;
             LogBehaviourType = new Dictionary<string, Action<string, string>>();
             LogBehaviourType.Add("AdminAction",LogAdminBehaviour);
             LogBehaviourType.Add("SystemAction",LogSystemBehaviour);
@@ -24,7 +22,8 @@ namespace InfrastructureLayer.Logging
         public void Log<TState>(LogLevel logLevel, EventId eventId,
             TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            _currentAcceptedLogLevel = ParseLogLevels(ParseLoggerEventName(eventId.Name!));
+            if (eventId.Name == null) return;
+            if (!LogBehaviourType.ContainsKey(eventId.Name)) return; // idk if thats the right way to solve this bug or not
             
             if (!IsEnabled(logLevel))
                 return;
@@ -37,7 +36,7 @@ namespace InfrastructureLayer.Logging
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return _currentAcceptedLogLevel <= logLevel;
+            return !(logLevel <= LogLevel.Debug) && logLevel != LogLevel.None;
         }
 
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull
@@ -51,7 +50,7 @@ namespace InfrastructureLayer.Logging
             
             SqlConnection connection = new SqlConnection(_dataBaseOptions.SqlConnection);
 
-            string query = @"Insert into SystemErrors 
+            string query = @"Insert into SystemErrors(ErrorMessage,ErrorDate,Category,LogLevel) 
                              Values(
                                     @message,
                                     @ErrorDate,
@@ -81,7 +80,7 @@ namespace InfrastructureLayer.Logging
             
             SqlConnection connection = new SqlConnection(_dataBaseOptions.SqlConnection);
 
-            string query = @"Insert into AdmisBehaviour 
+            string query = @"Insert into AdminsBehaviour(ActionMade,TimeStamp,Category,LogLevel)
                              Values(
                                     @message,
                                     @ErrorDate,
@@ -103,41 +102,6 @@ namespace InfrastructureLayer.Logging
                     command.ExecuteNonQuery();
                 }   
             }
-        }
-
-        private LogLevel ParseLogLevels(string logLevelString)
-        {
-            switch (logLevelString?.ToLowerInvariant())
-            {
-                case "trace":
-                    return LogLevel.Trace;
-                case "debug":
-                    return LogLevel.Debug;
-                case "information":
-                case "info":
-                    return LogLevel.Information;
-                case "warning":
-                case "warn":
-                    return LogLevel.Warning;
-                case "error":
-                    return LogLevel.Error;
-                case "critical":
-                    return LogLevel.Critical;
-                case "none":
-                    return LogLevel.None;
-                default:
-                    throw new ArgumentException($"Invalid log level: {logLevelString}");
-            }
-        }
-
-        private string ParseLoggerEventName(string eventName)
-        {
-            if (eventName != "AdminAction" && eventName != "SystemAction")
-            {
-                return "none";
-            }
-            return (eventName == "AdminAction" ? 
-                _dataBaseOptions.AdminBehaviour : _dataBaseOptions.SystemBehaviour);
         }
     }
     

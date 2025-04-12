@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using ApplicationLayer.Dtos.User_DTOs;
 using ApplicationLayer.Dtos.Order_DTOs;
 using ApplicationLayer.Users_Handling;
+using DomainLayer.Interfaces;
+using PresentationLayer.Filters;
 using PresentationLayer.Utilities;
 
 namespace PresentationLayer.Controllers
@@ -15,10 +17,12 @@ namespace PresentationLayer.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserHandler _userHandler;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(UserHandler userHandler)
+        public UserController(UserHandler userHandler,ILogger<UserController> logger)
         {
             _userHandler = userHandler;
+            _logger = logger;
         }
 
 

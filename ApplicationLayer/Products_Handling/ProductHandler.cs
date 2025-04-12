@@ -20,7 +20,7 @@ namespace ApplicationLayer.Products_Handling
             _medicalCategory = medicalCategory;
             _subMedicalCategory = subMedicalCategory;
         }
-
+        
         public bool TryCreateProduct(CreateProductDto product)
         {
             if (_productRepository.GetProductByName(product.ProductName) != null) return false;

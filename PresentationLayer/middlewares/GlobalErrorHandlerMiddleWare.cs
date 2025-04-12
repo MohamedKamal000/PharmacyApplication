@@ -1,15 +1,17 @@
 ﻿using System.Text.Json;
 using DomainLayer.Interfaces;
+using InfrastructureLayer.Logging;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PresentationLayer.middlewares
 {
     public class GlobalErrorHandlerMiddleWare
     {
-        /*private readonly RequestDelegate _next;
-        private readonly ISystemTrackingLogger _logger;
-
-        public GlobalErrorHandlerMiddleWare(RequestDelegate next,ISystemTrackingLogger logger)
+        private readonly RequestDelegate _next;
+        private readonly ILogger<GlobalErrorHandlerMiddleWare> _logger;
+        
+        public GlobalErrorHandlerMiddleWare(RequestDelegate next,
+            ILogger<GlobalErrorHandlerMiddleWare> logger)
         {
             _next = next;
             _logger = logger;
@@ -25,7 +27,9 @@ namespace PresentationLayer.middlewares
             }
             catch(Exception e)
             {
-                _logger.LogErrorMessage(e.Message,"");
+            
+                _logger.LogSystemBehaviour<GlobalErrorHandlerMiddleWare>("System error occurred",
+                    LogLevel.Error,e);
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
                 ProblemDetails problem = new ProblemDetails()
@@ -42,6 +46,6 @@ namespace PresentationLayer.middlewares
 
                 await context.Response.WriteAsync(error);
             }
-        }*/
+        }
     }
 }

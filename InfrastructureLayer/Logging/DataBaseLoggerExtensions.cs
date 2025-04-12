@@ -27,7 +27,7 @@ public static class DataBaseLoggerExtensions
             logLevel,new EventId(1,LogActionType.SystemAction.ToString()),message,
             exception,
             (e,f) => $"[{logLevel.ToString()}],[{typeof(TCategory).Name}]: {e}\n" +
-                     $"Exception Message:{e}");
+                     $"Exception Message:{f?.Message}");
     } 
     
     /*public static ILoggingBuilder AddDataBaseLogger(this ILoggingBuilder builder, 
