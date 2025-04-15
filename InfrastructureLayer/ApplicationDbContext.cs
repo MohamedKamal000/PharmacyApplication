@@ -22,11 +22,11 @@ namespace InfrastructureLayer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Users>().HasIndex(u => u.PhoneNumber).IsUnique();
+            modelBuilder.Entity<User>().HasIndex(u => u.PhoneNumber).IsUnique();
             modelBuilder.Entity<Delivery>().HasIndex(d => d.PhoneNumber).IsUnique();
         }
 
-        public DbSet<Users> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> MedicalProducts { get; set; }
         public DbSet<Delivery> DeliveryMen { get; set; }

@@ -10,10 +10,10 @@ namespace ApplicationLayer.Users_Handling
     public class UserHandler
     {
 
-        private readonly IUserRepository<Users> _userRepository;
+        private readonly IUserRepository<User> _userRepository;
         private readonly IProductRepository _productRepository;
 
-        public UserHandler(IUserRepository<Users> userRepository,IProductRepository productRepository)
+        public UserHandler(IUserRepository<User> userRepository,IProductRepository productRepository)
         {
             _userRepository = userRepository;
             _productRepository = productRepository;
@@ -22,8 +22,8 @@ namespace ApplicationLayer.Users_Handling
 
         public GetUserDto? GetUser(string phoneNumber)
         {
-            Users? user = _userRepository.RetrieveUser(phoneNumber);
-
+            User? user = _userRepository.RetrieveUser(phoneNumber);
+            
 
             return new GetUserDto(){PhoneNumber = user.PhoneNumber, UserName = user.UserName, Id = user.Id};
         }
@@ -34,7 +34,7 @@ namespace ApplicationLayer.Users_Handling
             userOrderDto = null;
             if (!_userRepository.CheckUserExistByPhone(phoneNumber)) return false;
 
-            Users user = _userRepository.RetrieveUser(phoneNumber)!;
+            User user = _userRepository.RetrieveUser(phoneNumber)!;
             var userOrder = _userRepository.GetUserOrders(user).ToList();
 
 
@@ -73,7 +73,7 @@ namespace ApplicationLayer.Users_Handling
         {
             if (!_userRepository.CheckUserExistByPhone(phoneNumber)) return false;
 
-            Users user = _userRepository.RetrieveUser(phoneNumber)!;
+            User user = _userRepository.RetrieveUser(phoneNumber)!;
             List<Order> orders = new List<Order>();
             Order baseOrderInformation = new Order()
             {

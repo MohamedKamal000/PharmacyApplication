@@ -61,7 +61,7 @@ namespace InfrastructureLayer.Repositories
             return orders;
         }
 
-        public int AcceptUserOrders(Users user, Delivery deliveryMan)
+        public int AcceptUserOrders(User user, Delivery deliveryMan)
         {
             int result = -1;
             try
@@ -92,7 +92,7 @@ namespace InfrastructureLayer.Repositories
             return result;
         }
 
-        public int DeclineUserOrder(Users user)
+        public int DeclineUserOrder(User user)
         {
             int result = -1;
             try
@@ -122,7 +122,7 @@ namespace InfrastructureLayer.Repositories
             return result;
         }
 
-        public int SetUserOrderAsDelivered(Users user)
+        public int SetUserOrderAsDelivered(User user)
         {
             int result = -1;
             try

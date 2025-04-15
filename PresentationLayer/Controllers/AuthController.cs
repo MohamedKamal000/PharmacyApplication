@@ -1,8 +1,14 @@
-﻿using ApplicationLayer.Dtos.User_DTOs;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using ApplicationLayer.Dtos.User_DTOs;
 using ApplicationLayer.Users_Handling;
 using DomainLayer;
 using DomainLayer.Interfaces;
+using InfrastructureLayer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using PresentationLayer.Utilities;
 
 namespace PresentationLayer.Controllers
@@ -12,24 +18,26 @@ namespace PresentationLayer.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserLogin _usersLogin;
-
-        public AuthController(UserLogin usersLogin)
+        private readonly ITokenGenerator _tokenGenerator;
+        
+        public AuthController(UserLogin usersLogin,ITokenGenerator tokenGenerator)
         {
             _usersLogin = usersLogin;
+            _tokenGenerator = tokenGenerator;
         }
 
 
         [HttpPost]
         [Route("RegisterUser")]
-        public ActionResult<int> RegisterNewUser(RegisterUserDto user_dto)
+        public ActionResult<string> RegisterNewUser(RegisterUserDto userDto)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            int resultID = _usersLogin.RegisterNewUser(user_dto);
+            var userIdentifier = _usersLogin.RegisterNewUser(userDto);
 
-            if (resultID != -1)
+            if (userIdentifier != null)
             {
-                return Ok(resultID);
+                return Ok(_tokenGenerator.GenerateToken(userIdentifier.IdentifyUser()));
             }
 
             ProblemDetails problem =
@@ -42,13 +50,17 @@ namespace PresentationLayer.Controllers
 
         [HttpPost]
         [Route("Login")]
-        public ActionResult<IUserRole> Login(LoginUserDto userLoginDto)
+        public ActionResult<string> Login(LoginUserDto userLoginDto)
         {
-            var requestResult = _usersLogin.Login(userLoginDto,out IUserRole? userRole);
+            if (!ModelState.IsValid)
+                return BadRequest();
+            
+            var requestResult = _usersLogin.Login(userLoginDto,out IUserIdentifier? userIdentifier);
 
-            if (!requestResult || userRole == null) return BadRequest();
+            if (!requestResult || userIdentifier == null) return BadRequest("InvalidCredentials");
 
-            return Ok(userRole.GetUserRole());
+            return Ok(_tokenGenerator.GenerateToken(userIdentifier.IdentifyUser()));
         }
+        
     }
 }

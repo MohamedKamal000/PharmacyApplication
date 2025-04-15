@@ -1,4 +1,5 @@
-﻿using ApplicationLayer.Dtos.Product_DTOS;
+﻿using System.Security.Claims;
+using ApplicationLayer.Dtos.Product_DTOS;
 using InfrastructureLayer.Logging;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ public class CreateProductAudit : IAsyncActionFilter
     {
         var actionResult = await next();
 
-        if (actionResult.Result is BadRequestObjectResult)
+        if (actionResult.Result is not  OkObjectResult)
         {
             return;
         }
@@ -39,8 +40,12 @@ public class CreateProductAudit : IAsyncActionFilter
             args = "Couldn't Gather the arguments";
         }
 
-        string message = "Admin Created Product with the following parameters: " + args;
-        _logger.LogAdminBehaviour<CreateProductAudit>(message);
+        string? adminName = actionResult.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+        string? phoneNumber = actionResult.HttpContext.User.FindFirst("PhoneNumber")?.Value;
         
+        
+        string message = $"Admin (Name: {adminName}, Phone: {phoneNumber})," +
+                         $" Created Product with the following parameters: " + args;
+        _logger.LogAdminBehaviour<CreateProductAudit>(message);
     }
 }

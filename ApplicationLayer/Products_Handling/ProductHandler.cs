@@ -43,9 +43,9 @@ namespace ApplicationLayer.Products_Handling
             return result != -1;
         }
 
-        public bool TryUpdateProduct(CreateProductDto product)
+        public bool TryUpdateProduct(string oldProductName,CreateProductDto product)
         {
-            Product ? p = _productRepository.GetProductByName(product.ProductName);
+            Product ? p = _productRepository.GetProductByName(oldProductName);
             if (p == null) return false;
             if (!_medicalCategory.CheckExist(product.ProductCategory) ||
                 !_subMedicalCategory.CheckExist(product.ProductSubCategory)) return false;

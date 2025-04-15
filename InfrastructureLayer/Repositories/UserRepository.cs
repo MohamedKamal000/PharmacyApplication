@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InfrastructureLayer.Repositories
 {
-    public class UserRepository : GenericRepository<Users>, IUserRepository<Users>
+    public class UserRepository : GenericRepository<User>, IUserRepository<User>
     {
         
         public UserRepository(ApplicationDbContext connection) 
@@ -17,7 +17,7 @@ namespace InfrastructureLayer.Repositories
 
         // must get the user first from db and send it to this function
         // idk if this will be only for admins or both admins and users 
-        public ICollection<Order> GetUserOrders(Users user)
+        public ICollection<Order> GetUserOrders(User user)
         {
             List<Order> userOrder = new List<Order>();
 
@@ -47,9 +47,9 @@ namespace InfrastructureLayer.Repositories
             return userOrder;
         }
 
-        public  Users? RetrieveUser(string phoneNumber)
+        public  User? RetrieveUser(string phoneNumber)
         {
-            Users user;
+            User user;
 
             try
             {

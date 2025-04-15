@@ -17,26 +17,26 @@ namespace ApplicationLayer.Users_Handling
     
     public class UserLogin
     {
-        private readonly IUserRepository<Users?> _usersGenericRepository;
+        private readonly IUserRepository<User?> _usersGenericRepository;
         private readonly IPasswordHasher _passwordHasher;
         
-        public UserLogin(IUserRepository<Users?> usersGenericRepository,IPasswordHasher passwordHasher)
+        public UserLogin(IUserRepository<User?> usersGenericRepository,IPasswordHasher passwordHasher)
         {
             _usersGenericRepository = usersGenericRepository;
             _passwordHasher = passwordHasher;
         }
         
-        public  bool Login(LoginUserDto userLoginDto,out IUserRole? userRole)
+        public  bool Login(LoginUserDto userLoginDto,out IUserIdentifier? userRole)
         {
             bool isOk = false;
             userRole = null;
             
-            Users? user = _usersGenericRepository.RetrieveUser(userLoginDto.PhoneNumber);
+            User? user = _usersGenericRepository.RetrieveUser(userLoginDto.PhoneNumber);
             if (user != null && _passwordHasher.Verify(userLoginDto.Password, user.Password))
             {
                 userRole = user.Role
-                    ? new Admin(user.PhoneNumber) as IUserRole
-                    : new User(user.PhoneNumber) as IUserRole;
+                    ? new AdminIdentity(user.PhoneNumber,user.UserName) 
+                    : new UserIdentity(user.PhoneNumber,user.UserName);
                 isOk = true;
             }
             
@@ -44,29 +44,34 @@ namespace ApplicationLayer.Users_Handling
             return isOk;
         }
 
-        public  int RegisterNewUser(RegisterUserDto userDto)
+        public  IUserIdentifier? RegisterNewUser(RegisterUserDto userDto)
         {
-            if (!userDto.PhoneNumber.All(char.IsDigit)) return -1;
-            if (_usersGenericRepository.CheckUserExistByPhone(userDto.PhoneNumber)) return -1;
+            if (!userDto.PhoneNumber.All(char.IsDigit)) return null;
+            if (_usersGenericRepository.CheckUserExistByPhone(userDto.PhoneNumber)) return null;
 
 
-            Users user = new Users()
+            User user = new User()
             {
                 PhoneNumber = userDto.PhoneNumber,
                 Password = userDto.Password,
                 UserName = userDto.UserName,
                 Role = false
             };
-
+            
             user.Password = _passwordHasher.Hash(userDto.Password);
-            return _usersGenericRepository.Add(user);
+            
+            UserIdentity? userIdentity = _usersGenericRepository.Add(user) != -1 ? 
+                new UserIdentity(user.PhoneNumber,user.UserName) 
+                : null;
+            
+            return userIdentity;
         }
         
-        public  bool ChangePassword(IUserRole userSession, string newPassword,string oldPassword)
+        public  IUserIdentifier? ChangePassword(string userPhoneNumber, string newPassword,string oldPassword)
         {
-            bool isOk = false;
-
-            Users? user = _usersGenericRepository.RetrieveUser(userSession.IdentifyUser());
+            IUserIdentifier? isOk = null;
+            
+            User? user = _usersGenericRepository.RetrieveUser(userPhoneNumber);
 
             if (user == null) return isOk;
             
@@ -80,18 +85,24 @@ namespace ApplicationLayer.Users_Handling
             int result = _usersGenericRepository.Update(user);
 
 
-
-            isOk = result != -1;
-
+            if (result == -1)
+                isOk = null;
+            else
+                isOk = user.Role
+                    ? new AdminIdentity(user.PhoneNumber, user.UserName)
+                    : new UserIdentity(user.PhoneNumber, user.UserName);
+            
             return isOk;
         }
 
+        
 
-        public  bool DeleteAccount(IUserRole userSession, string password)
+        // should apply as well to the jwt token
+        public bool DeleteAccount(string userPhoneNumber, string password)
         {
             bool isOk = false;
 
-            Users ? user = _usersGenericRepository.RetrieveUser(userSession.IdentifyUser());
+            User ? user = _usersGenericRepository.RetrieveUser(userPhoneNumber);
 
             if (user == null) return isOk;
             
@@ -104,5 +115,29 @@ namespace ApplicationLayer.Users_Handling
             return isOk;
         }
 
+        
+        
+        public IUserIdentifier? TryUpdateUser(string oldPhoneNumber,UpdateUserDto updateUserDto)
+        {
+            IUserIdentifier? isOk = null;
+
+            User? user = _usersGenericRepository.RetrieveUser(oldPhoneNumber);
+
+            if (user == null) return isOk;
+
+            user.UserName = updateUserDto.NewUserName;
+            user.PhoneNumber = updateUserDto.PhoneNumber;
+
+            int result = _usersGenericRepository.Update(user);
+
+            if (result == -1) return isOk;
+            isOk = user.Role
+                ? new AdminIdentity(user.PhoneNumber, user.UserName)
+                : new UserIdentity(user.PhoneNumber, user.UserName);
+
+            return isOk;
+        }
+        
+        
     }
 }

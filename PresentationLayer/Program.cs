@@ -1,3 +1,6 @@
+using System.Text;
+using ApplicationLayer;
+using ApplicationLayer.Categories_Handling;
 using ApplicationLayer.Products_Handling;
 using ApplicationLayer.Users_Handling;
 using DomainLayer;
@@ -7,7 +10,10 @@ using InfrastructureLayer;
 using InfrastructureLayer.Logging;
 using InfrastructureLayer.Repositories;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using PresentationLayer.Authentications;
+using PresentationLayer.Extensions;
 using PresentationLayer.middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,19 +39,31 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>();
-builder.Services.AddAuthentication()
-    .AddScheme<AuthenticationSchemeOptions, BearerAuthenticationHandler>("Bearer", null);
 
-builder.Services.AddScoped<IUserRepository<Users>, UserRepository>();
-builder.Services.AddScoped<IProductRepository, MedicalProductsRepository>();
-builder.Services.AddScoped<IDeliveryRepository,DeliveryRepository>();
-builder.Services.AddScoped<IMedicalCategory,MedicalCategoryRepository>();
-builder.Services.AddScoped<IOrdersRepository,OrdersRepository>();
-builder.Services.AddScoped<ISubMedicalCategory,SubMedicalCategoryRepository>();
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
-builder.Services.AddScoped<UserLogin>();
-builder.Services.AddScoped<UserHandler>();
-builder.Services.AddScoped<ProductHandler>();
+var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+builder.Services.AddSingleton(jwtOptions);
+
+builder.Services.AddAuthentication()
+    // .AddScheme<AuthenticationSchemeOptions, BearerAuthenticationHandler>("Bearer", null);
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidAudience = jwtOptions.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey))
+        };
+    });
+
+
+builder.Services.AddUtilties();
+builder.Services.AddRepositories();
+builder.Services.AddHandlers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -60,7 +78,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseMiddleware<RequestTimeMeasurementMiddleWare>();
-// app.UseMiddleware<GlobalErrorHandlerMiddleWare>();
+app.UseMiddleware<GlobalErrorHandlerMiddleWare>();
 
 app.MapControllers();
 

@@ -3,7 +3,7 @@
     public interface IUserRepository<TObject> : IRepository<TObject>
     {
         ICollection<Order> GetUserOrders(TObject user);
-        Users? RetrieveUser(string phoneNumber);
+        User? RetrieveUser(string phoneNumber);
 
         int AddOrders(List<Order> orders);
 

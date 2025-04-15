@@ -38,7 +38,7 @@ namespace ApplicationLayer.Categories_Handling
         public bool TryGetAllCategories(out List<MedicalCategory> medicalCategories)
         {
             medicalCategories = _medicalCategoryRepository.GetAll().ToList();
-            return true;
+            return true; // idk it's just a true right ?
         }
 
         public bool TryUpdateCategory(int id, string newCategoryName)

@@ -19,9 +19,9 @@ public class BearerAuthenticationHandler : AuthenticationHandler<AuthenticationS
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.ContainsKey("Authentication"))
+        if (!Request.Headers.ContainsKey("Authorization"))
             return Task.FromResult(AuthenticateResult.NoResult());
-        var authHeader = Request.Headers["Authentication"];
+        var authHeader = Request.Headers["Authorization"];
         if (!authHeader.ToString().StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             return Task.FromResult(AuthenticateResult.Fail("Invalid Scheme"));
         

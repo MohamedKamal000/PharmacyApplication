@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DomainLayer
 {
 
-    public class Users
+    public class User
     {
         [Key]
         public int Id { get; set; }
@@ -47,7 +47,7 @@ namespace DomainLayer
         public DateTime OrderDate { get; set; } // one time
 
         [ForeignKey(nameof(UserId))]
-        public Users User { get; set; } = null!; // one time
+        public User User { get; set; } = null!; // one time
 
         [ForeignKey(nameof(ProductId))]
         public Product Product { get; set; } = null!;

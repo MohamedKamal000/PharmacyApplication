@@ -9,10 +9,10 @@ namespace DomainLayer.Interfaces.RepositoryIntefraces
     public interface IOrdersRepository : IRepository<Order>
     {
         ICollection<Order> GetAllWithStatus(OrderStatusEnum status);
-        int AcceptUserOrders(Users user, Delivery deliveryMan);
+        int AcceptUserOrders(User user, Delivery deliveryMan);
 
-        int DeclineUserOrder(Users user);
+        int DeclineUserOrder(User user);
 
-        int SetUserOrderAsDelivered(Users user);
+        int SetUserOrderAsDelivered(User user);
     }
 }

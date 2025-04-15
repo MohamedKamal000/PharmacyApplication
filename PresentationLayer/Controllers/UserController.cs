@@ -7,6 +7,7 @@ using ApplicationLayer.Dtos.User_DTOs;
 using ApplicationLayer.Dtos.Order_DTOs;
 using ApplicationLayer.Users_Handling;
 using DomainLayer.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using PresentationLayer.Filters;
 using PresentationLayer.Utilities;
 
@@ -14,20 +15,20 @@ namespace PresentationLayer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly UserHandler _userHandler;
-        private readonly ILogger<UserController> _logger;
 
-        public UserController(UserHandler userHandler,ILogger<UserController> logger)
+        public UserController(UserHandler userHandler)
         {
             _userHandler = userHandler;
-            _logger = logger;
         }
 
 
         [HttpGet]
         [Route("{phoneNumber}")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<GetUserDto> GetUser(
             [Required(ErrorMessage = "PhoneNumber is Required")]
             [StringLength(11, MinimumLength = 11, ErrorMessage = "Phone Number is not accepted")]
