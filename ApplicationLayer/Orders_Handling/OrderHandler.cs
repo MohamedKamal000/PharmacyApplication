@@ -9,7 +9,6 @@ namespace ApplicationLayer.Orders_Handling
 {
     public class OrderHandler
     {
-
         private readonly IOrdersRepository _ordersRepository;
         private readonly IUserRepository<User> _userRepository;
         private readonly IDeliveryRepository _deliveryRepository;
@@ -76,19 +75,19 @@ namespace ApplicationLayer.Orders_Handling
         }
 
 
-        public bool TryAcceptOrder(GetUserDto userDto, DeliveryDto delivery)
+        public bool TryAcceptOrder(string userPhoneNumber, string deliveryPhoneNumber)
         {
-            User ? user = _userRepository.RetrieveUser(userDto.PhoneNumber);
-            Delivery? deliveryMan = _deliveryRepository.SearchDeliveryManByPhone(delivery.PhoneNumber);
+            User ? user = _userRepository.RetrieveUser(userPhoneNumber);
+            Delivery? deliveryMan = _deliveryRepository.SearchDeliveryManByPhone(deliveryPhoneNumber);
             if (user == null || deliveryMan == null) return false;
 
 
             return _ordersRepository.AcceptUserOrders(user, deliveryMan) != -1;
         }
 
-        public bool TryDeclineUserOrder(GetUserDto userDto)
+        public bool TryDeclineUserOrder(string userPhoneNumber)
         {
-            User? user = _userRepository.RetrieveUser(userDto.PhoneNumber);
+            User? user = _userRepository.RetrieveUser(userPhoneNumber);
             // should retrive delivery man here as well
             if (user == null) return false;
 
@@ -97,9 +96,9 @@ namespace ApplicationLayer.Orders_Handling
         }
 
 
-        public bool TrySetOrderAsDelivered(GetUserDto userDto)
+        public bool TrySetOrderAsDelivered(string userPhoneNumber)
         {
-            User? user = _userRepository.RetrieveUser(userDto.PhoneNumber);
+            User? user = _userRepository.RetrieveUser(userPhoneNumber);
             // should retrive delivery man here as well
             if (user == null) return false;
 

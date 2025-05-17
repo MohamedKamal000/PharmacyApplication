@@ -26,7 +26,7 @@ namespace ApplicationLayer.Categories_Handling
             return _medicalCategoryRepository.Add(medicalCategory) != -1;
         }
 
-        public bool TryDeleteNewCategory(int id)
+        public bool TryDeleteCategory(int id)
         {
             if (!_medicalCategoryRepository.CheckExist(id)) return false;
 

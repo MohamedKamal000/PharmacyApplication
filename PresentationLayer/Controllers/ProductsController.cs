@@ -91,7 +91,7 @@ public class ProductsController : ControllerBase
     public ActionResult<Product> GetProduct(
         [Required(ErrorMessage = "Invalid Input")]
         [StringLength(maximumLength: 190, MinimumLength = 20)]
-        string productName)
+        [FromRoute] string productName)
     {
         if (!ModelState.IsValid) return BadRequest();
 
@@ -110,7 +110,7 @@ public class ProductsController : ControllerBase
     public ActionResult<List<Product>> GetProductsWithCategory(
         [Required(ErrorMessage = "Category Name is Required")]
         [StringLength(maximumLength:200,MinimumLength = 4,ErrorMessage = "String Length is not accepted")]
-        string category)
+        [FromRoute] string category)
     {
         if (!ModelState.IsValid) return BadRequest();
 
@@ -124,11 +124,30 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
+    [Route("ProductsWithSubCategory/{subCategory}")]
+    public ActionResult<List<Product>> GetProductsWithSubCategory(
+        [Required(ErrorMessage = "Category Name is Required")]
+        [StringLength(maximumLength:200,MinimumLength = 4,ErrorMessage = "String Length is not accepted")]
+        [FromRoute] string subCategory)
+    {
+        if (!ModelState.IsValid) return BadRequest();
+
+        if (_productHandler.TryGetAllProductsBySubCategory(subCategory,out List<Product> ? products))
+        {
+            return Ok(products);
+        }
+        
+        return  BadRequest(ProblemDetailsManipulator
+            .CreateProblemDetailWithBadRequest("InvalidInput"));
+    }
+    
+    
+    [HttpGet]
     [Route("isAvailable/{productName}")]
     public ActionResult<string> IsProductAvailable(
         [Required(ErrorMessage = "Invalid Input")]
         [StringLength(maximumLength: 190, MinimumLength = 20)]
-        string productName)
+        [FromRoute] string productName)
     {
         if (!ModelState.IsValid) return BadRequest();
 

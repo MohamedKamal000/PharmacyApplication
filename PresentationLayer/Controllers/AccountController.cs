@@ -9,7 +9,7 @@ namespace PresentationLayer.Controllers;
 
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [Authorize]
 public class AccountController : ControllerBase
 {

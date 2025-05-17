@@ -51,9 +51,9 @@ namespace ApplicationLayer.Delivery_Handling
             }) != -1;
         }
 
-        public bool TryUpdateDeliveryMan(DeliveryDto delivery)
+        public bool TryUpdateDeliveryMan(string oldPhoneNumber,DeliveryDto delivery)
         {
-            Delivery? d = _deliveryRepository.SearchDeliveryManByPhone(delivery.PhoneNumber);
+            Delivery? d = _deliveryRepository.SearchDeliveryManByPhone(oldPhoneNumber);
             if (d == null) return false;
 
             d.PhoneNumber = delivery.PhoneNumber;

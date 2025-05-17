@@ -1,5 +1,7 @@
 ﻿using ApplicationLayer;
 using ApplicationLayer.Categories_Handling;
+using ApplicationLayer.Delivery_Handling;
+using ApplicationLayer.Orders_Handling;
 using ApplicationLayer.Products_Handling;
 using ApplicationLayer.Users_Handling;
 using DomainLayer;
@@ -31,6 +33,8 @@ public static class ServicesCollectionsExtension
         serviceCollection.AddScoped<ProductHandler>();
         serviceCollection.AddScoped<MainCategoryHandler>();
         serviceCollection.AddScoped<SubCategoryHandler>();
+        serviceCollection.AddScoped<OrderHandler>();
+        serviceCollection.AddScoped<DeliveryManHandler>();
         return serviceCollection;
     }
 

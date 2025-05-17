@@ -32,6 +32,10 @@ builder.Logging.AddProvider(new DataBaseLoggerProvider(
     }
 ));
 
+// Admin123
+// 01544444444
+// helloworld1234
+
 // Add services to the container.
 
 builder.Services.AddControllers();
